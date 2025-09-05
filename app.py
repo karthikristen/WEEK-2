@@ -93,19 +93,19 @@ with tabs[0]:
     if st.button("Run Analysis"):
         score = predict_contamination(ph, tds, hardness, nitrate)
 
-        # Display textual result
         if score < 30:
             result = '✅ Safe: No significant radioactive contamination detected.'
         elif score < 60:
             result = '⚠️ Moderate Risk: Some radioactive traces possible.'
         else:
             result = '☢️ High Risk: Potential radioactive contamination detected!'
+
         st.markdown(f"<p style='font-size:20px; color:#FFD300;'>{result}</p>", unsafe_allow_html=True)
 
-        # ----- Animated Gauge Meter -----
+        # ----------------- Animated Gauge -----------------
         fig = go.Figure(go.Indicator(
             mode="gauge+number",
-            value=0,  # start from 0
+            value=0,
             title={'text': "Radioactive Risk %"},
             gauge={
                 'axis': {'range': [0, 100]},
@@ -117,15 +117,15 @@ with tabs[0]:
                 ],
             }
         ))
-        st.plotly_chart(fig, use_container_width=True)
+        gauge_placeholder = st.empty()
 
         # Animate the needle smoothly
         for i in range(0, int(score)+1, 2):
             fig.update_traces(value=i)
-            st.plotly_chart(fig, use_container_width=True)
+            gauge_placeholder.plotly_chart(fig, use_container_width=True)
             time.sleep(0.02)
 
-        # Save dataset
+        # ----------------- Save Dataset -----------------
         new_data = pd.DataFrame([[location, ph, tds, hardness, nitrate, score]],
                                 columns=["Location", "pH", "TDS", "Hardness", "Nitrate", "RiskScore"])
         if os.path.exists("water_data.csv"):
@@ -159,7 +159,7 @@ with tabs[1]:
             if i + j >= len(params):
                 break
             param, (low, high, value) = params[i + j]
-            
+
             with col:
                 subcols = st.columns([1.1, 1.0, 0.7])  # Graph + value + status
 
@@ -269,6 +269,3 @@ with tabs[2]:
 # Footer
 st.markdown("---")
 st.markdown('<p style="text-align:center; color:#FFD300;">👨‍💻 Developed by Karthikeyan</p>', unsafe_allow_html=True)
-
-
-
