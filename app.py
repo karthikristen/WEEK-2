@@ -180,7 +180,55 @@ with tabs[0]:
 # ---- TAB 2 ----
 with tabs[1]:
     st.subheader("📊 Safe vs Unsafe Water Levels")
-    show_safety_graph(ph, tds, hardness, nitrate)
+
+    safe_ranges = {
+        "pH": (6.5, 8.5, ph),
+        "TDS (mg/L)": (0, 500, tds),
+        "Hardness (mg/L)": (0, 200, hardness),
+        "Nitrate (mg/L)": (0, 45, nitrate)
+    }
+
+    for param, (low, high, value) in safe_ranges.items():
+        col1, col2 = st.columns([1.1, 1.0])  # small graph + value side by side
+
+        with col1:
+            fig = go.Figure()
+            fig.add_trace(go.Bar(
+                x=[param],
+                y=[value],
+                name=f"{param} Value",
+                marker_color="red" if value < low or value > high else "green"
+            ))
+            fig.add_shape(
+                type="rect",
+                x0=-0.5, x1=0.5,
+                y0=low, y1=high,
+                fillcolor="lightgreen",
+                opacity=0.3,
+                line_width=0
+            )
+            fig.update_layout(
+                title=f"{param} Level",
+                barmode="overlay",
+                height=220, width=220,  # make graphs small
+                margin=dict(l=20, r=20, t=40, b=20)
+            )
+            st.plotly_chart(fig, use_container_width=False)
+
+        with col2:
+            st.markdown(
+                f"""
+                <div style="font-size:18px; color:#FFD300;">
+                <b>{param}</b><br>
+                ✅ Safe Range: {low} – {high}<br>
+                💧 Your Value: <span style="color:{'red' if value < low or value > high else 'lightgreen'};">{value}</span>
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
+
+    st.info("ℹ️ Compare your water parameters above with the WHO safe ranges.")
+
 
 # ---- TAB 3 ----
 with tabs[2]:
@@ -194,3 +242,4 @@ with tabs[2]:
 
 st.markdown("---")
 st.markdown('<p style="text-align:center; color:#FFD300;">👨‍💻 Developed by Karthikeyan</p>', unsafe_allow_html=True)
+
