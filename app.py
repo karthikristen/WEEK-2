@@ -34,6 +34,7 @@ p.app-sub {
   color: #39FF14;
   margin-top: 0;
   font-size: 20px;
+  text-shadow: 0 0 10px #39FF14;
 }
 
 /* Tabs */
@@ -92,13 +93,13 @@ with tabs[0]:
         score = predict_contamination(ph, tds, hardness, nitrate)
 
         if score < 30:
-            result = '<p style="color:#39FF14; font-size:20px;"><b>✅ Safe:</b> No significant radioactive contamination detected.</p>'
+            result = '✅ Safe: No significant radioactive contamination detected.'
         elif score < 60:
-            result = '<p style="color:orange; font-size:20px;"><b>⚠️ Moderate Risk:</b> Some radioactive traces possible.</p>'
+            result = '⚠️ Moderate Risk: Some radioactive traces possible.'
         else:
-            result = '<p style="color:red; font-size:20px;"><b>☢️ High Risk:</b> Potential radioactive contamination detected!</p>'
+            result = '☢️ High Risk: Potential radioactive contamination detected!'
 
-        st.markdown(result, unsafe_allow_html=True)
+        st.markdown(f"<p style='font-size:20px; color:#FFD300;'>{result}</p>", unsafe_allow_html=True)
 
         # Save dataset
         new_data = pd.DataFrame([[location, ph, tds, hardness, nitrate, score]],
@@ -144,6 +145,7 @@ with tabs[1]:
                     fig.add_trace(go.Bar(
                         x=[param],
                         y=[value],
+                        name=f"{param} Value",
                         marker_color="red" if value < low or value > high else "#39FF14"
                     ))
                     # Safe range overlay
@@ -165,7 +167,13 @@ with tabs[1]:
                 # Display Value
                 with subcols[1]:
                     st.markdown(
-                        f"<div style='font-size:16px; color:#FFD300;'><b>{param}</b><br>Safe Range: {low} – {high}<br>Your Value: <span style='color:{'red' if value < low or value > high else '#39FF14'};'>{value}</span></div>",
+                        f"""
+                        <div style="font-size:16px; color:#FFD300;">
+                        <b>{param}</b><br>
+                        Safe Range: {low} – {high}<br>
+                        Your Value: <span style="color:{'red' if value < low or value > high else '#39FF14'};">{value}</span>
+                        </div>
+                        """,
                         unsafe_allow_html=True
                     )
 
@@ -173,7 +181,10 @@ with tabs[1]:
                 with subcols[2]:
                     status = "✅ Safe" if low <= value <= high else "⚠️ Unsafe"
                     color = "#39FF14" if low <= value <= high else "red"
-                    st.markdown(f"<div style='font-size:18px; color:{color};'><b>{status}</b></div>", unsafe_allow_html=True)
+                    st.markdown(
+                        f"<div style='font-size:18px; color:{color};'><b>{status}</b></div>",
+                        unsafe_allow_html=True
+                    )
 
     st.info("ℹ️ Compare your water parameters above with the WHO safe ranges.")
 
@@ -210,6 +221,7 @@ with tabs[2]:
         </ul>
     </div>
     """
+
     st.markdown(awareness_html, unsafe_allow_html=True)
     st.info("ℹ️ Stay informed and take action to ensure safe drinking water.")
 
