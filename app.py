@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import plotly.graph_objects as go
+import os
 
 # ================= PAGE CONFIG =================
 st.set_page_config(page_title="Radioactive Water Contamination Detector", layout="wide")
@@ -23,7 +24,7 @@ html, body, [class*="css"] {
 /* Title & Subtitle */
 h1.app-title {
   text-align: center;
-  color: #FFD300; /* Yellow radioactive title */
+  color: #FFD300;
   font-size: 52px;
   margin-bottom: 4px;
   text-shadow: 0 0 10px #FFD300, 0 0 28px #FF7518;
@@ -73,7 +74,6 @@ p.app-sub {
 }
 </style>
 """
-
 st.markdown(css_block, unsafe_allow_html=True)
 
 # ================= FUNCTIONS =================
@@ -85,7 +85,7 @@ def predict_contamination(ph, tds, hardness, nitrate):
     if nitrate > 45: score += 25
     return score
 
-def show_risk_gauge(score):
+def show_risk_gauge(score, key=None):
     fig = go.Figure(go.Indicator(
         mode="gauge+number",
         value=score,
@@ -100,43 +100,11 @@ def show_risk_gauge(score):
             ],
         }
     ))
-    st.plotly_chart(fig, use_container_width=True)
-
-def show_safety_graph(ph, tds, hardness, nitrate):
-    safe_ranges = {
-        "pH": (6.5, 8.5),
-        "TDS": (0, 500),
-        "Hardness": (0, 200),
-        "Nitrate": (0, 45),
-    }
-    values = {"pH": ph, "TDS": tds, "Hardness": hardness, "Nitrate": nitrate}
-
-    fig = go.Figure()
-    for param, (low, high) in safe_ranges.items():
-        fig.add_trace(go.Bar(
-            x=[param],
-            y=[values[param]],
-            name=f"{param} Value",
-            marker_color="red" if values[param] < low or values[param] > high else "green"
-        ))
-        fig.add_trace(go.Bar(
-            x=[param],
-            y=[high],
-            name=f"{param} Safe Max",
-            marker_color="lightgreen",
-            opacity=0.5
-        ))
-
-    fig.update_layout(
-        title="Water Quality vs Safe Ranges",
-        barmode="overlay",
-        yaxis_title="Levels (mg/L or pH)"
-    )
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, use_container_width=True, key=key)
 
 # ================= UI =================
 st.markdown("<h1 class='app-title'>💧☢️ Radioactive Water Contamination Detector</h1>", unsafe_allow_html=True)
-st.markdown("<p class='app-sub'>Futuristic AI/ML Powered System | Developed by Karthikeyan</p>", unsafe_allow_html=True)
+st.markdown("<p class='app-sub'>AI/ML Powered Water Safety | Developed by Karthikeyan</p>", unsafe_allow_html=True)
 
 tabs = st.tabs(["🔬 Contamination Check", "📊 Safety Meter", "⚠️ Radioactive Awareness"])
 
@@ -161,15 +129,15 @@ with tabs[0]:
             result = '<p class="glow-red">☢️ High Risk: Potential radioactive contamination detected!</p>'
 
         st.markdown(result, unsafe_allow_html=True)
-        show_risk_gauge(score)
+        show_risk_gauge(score, key="overall_risk_gauge")
 
         # Save dataset
         new_data = pd.DataFrame([[location, ph, tds, hardness, nitrate, score]],
                                 columns=["Location", "pH", "TDS", "Hardness", "Nitrate", "RiskScore"])
-        try:
+        if os.path.exists("water_data.csv"):
             old_data = pd.read_csv("water_data.csv")
             df = pd.concat([old_data, new_data], ignore_index=True)
-        except:
+        else:
             df = new_data
         df.to_csv("water_data.csv", index=False)
 
@@ -181,7 +149,7 @@ with tabs[0]:
 with tabs[1]:
     st.subheader("📊 Safe vs Unsafe Water Levels")
 
-    # Function to calculate mini risk for each parameter
+    # Function to calculate mini risk per parameter
     def param_risk(value, low, high):
         if low <= value <= high:
             return 0
@@ -198,9 +166,9 @@ with tabs[1]:
     }
 
     for param, (low, high, value) in safe_ranges.items():
-        col1, col2, col3 = st.columns([1.1, 1.0, 0.7])  # Graph + value + mini gauge
+        col1, col2, col3 = st.columns([1.1, 1.0, 0.7])
 
-        # ---- Small Bar Graph ----
+        # Small Bar Graph
         with col1:
             fig = go.Figure()
             fig.add_trace(go.Bar(
@@ -222,9 +190,9 @@ with tabs[1]:
                 height=200, width=200,
                 margin=dict(l=15, r=15, t=35, b=15)
             )
-            st.plotly_chart(fig, use_container_width=False)
+            st.plotly_chart(fig, use_container_width=False, key=f"bar_{param}")
 
-        # ---- Display Value ----
+        # Display Value
         with col2:
             st.markdown(
                 f"""
@@ -237,7 +205,7 @@ with tabs[1]:
                 unsafe_allow_html=True
             )
 
-        # ---- Mini Risk Gauge ----
+        # Mini Gauge
         with col3:
             score = param_risk(value, low, high)
             fig_gauge = go.Figure(go.Indicator(
@@ -258,12 +226,14 @@ with tabs[1]:
                 height=180,
                 margin=dict(l=0, r=0, t=10, b=10)
             )
-            st.plotly_chart(fig_gauge, use_container_width=False)
+            st.plotly_chart(fig_gauge, use_container_width=False, key=f"gauge_{param}")
+
+    st.info("ℹ️ Compare your water parameters above with the WHO safe ranges.")
 
 # ---- TAB 3 ----
 with tabs[2]:
     st.subheader("⚠️ Dangers of Radioactive Water")
-    st.image("radioactive_process.png", caption="Radioactive Contamination Process")  # <-- Your saved anime-style image
+    st.image("radioactive_process.png", caption="Radioactive Contamination Process")
     st.write("""
     - ☢️ Radioactive water exposure can cause **cancer, organ damage, and genetic mutations**.  
     - ☠️ Animals and plants also suffer from **biological accumulation** of radioactive isotopes.  
@@ -272,7 +242,3 @@ with tabs[2]:
 
 st.markdown("---")
 st.markdown('<p style="text-align:center; color:#FFD300;">👨‍💻 Developed by Karthikeyan</p>', unsafe_allow_html=True)
-
-
-
-
