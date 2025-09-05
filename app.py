@@ -180,7 +180,38 @@ with tabs[0]:
 # ---- TAB 2 ----
 with tabs[1]:
     st.subheader("📊 Safe vs Unsafe Water Levels")
-    show_safety_graph(ph, tds, hardness, nitrate)
+
+    safe_ranges = {
+        "pH": (6.5, 8.5, ph),
+        "TDS (mg/L)": (0, 500, tds),
+        "Hardness (mg/L)": (0, 200, hardness),
+        "Nitrate (mg/L)": (0, 45, nitrate)
+    }
+
+    for param, (low, high, value) in safe_ranges.items():
+        fig = go.Figure()
+        fig.add_trace(go.Bar(
+            x=[param],
+            y=[value],
+            name=f"{param} Value",
+            marker_color="red" if value < low or value > high else "green"
+        ))
+        fig.add_trace(go.Bar(
+            x=[param],
+            y=[high],
+            name=f"{param} Safe Max",
+            marker_color="lightgreen",
+            opacity=0.5
+        ))
+        fig.update_layout(
+            title=f"{param} Level",
+            barmode="overlay",
+            yaxis_title="Value"
+        )
+        st.plotly_chart(fig, use_container_width=True)
+
+    st.info("ℹ️ Enter your water parameters in **Tab 1** to compare them with the normal safe ranges. Each graph above shows how your input compares against the safe limit.")
+
 
 # ---- TAB 3 ----
 with tabs[2]:
@@ -194,4 +225,5 @@ with tabs[2]:
 
 st.markdown("---")
 st.markdown('<p style="text-align:center; color:#FFD300;">👨‍💻 Developed by Karthikeyan</p>', unsafe_allow_html=True)
+
 
