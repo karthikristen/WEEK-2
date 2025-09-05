@@ -1,30 +1,9 @@
 import streamlit as st
 import pandas as pd
 import plotly.graph_objects as go
-import random
 
 # ================= PAGE CONFIG =================
 st.set_page_config(page_title="Radioactive Water Contamination Detector", layout="wide")
-
-# ================= BACKGROUND ELEMENTS =================
-drops_html = ""
-for i in range(12):
-    delay = round(random.uniform(0, 6), 2)
-    duration = round(random.uniform(5, 9), 2)
-    left = random.randint(2, 95)
-    size = random.randint(10, 20)
-    drops_html += f"<div class='bg-drop' style='left:{left}%; font-size:{size}px; animation-delay:{delay}s; animation-duration:{duration}s;'>💧</div>"
-
-rad_html = ""
-for i in range(6):
-    delay = round(random.uniform(0, 6), 2)
-    duration = round(random.uniform(6, 12), 2)
-    left = random.randint(5, 90)
-    top = random.randint(5, 80)
-    size = random.randint(18, 30)
-    rad_html += f"<div class='bg-radio' style='left:{left}%; top:{top}%; font-size:{size}px; animation-delay:{delay}s; animation-duration:{duration}s;'>☢️</div>"
-
-hazard_html = "<div class='hazard-bar'></div>"
 
 # ================= CUSTOM CSS =================
 css_block = """
@@ -96,72 +75,10 @@ p.app-sub {
     text-shadow: 0 0 20px red;
     font-size: 22px;
 }
-
-/* Background Overlay */
-.bg-overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 1;
-  pointer-events: none;
-  overflow: hidden;
-}
-@keyframes dropFall {
-  0%   { transform: translateY(-120px); opacity: 1; }
-  100% { transform: translateY(110vh); opacity: 0; }
-}
-.bg-drop {
-  position: absolute;
-  top: -120px;
-  color: #39FF14;
-  text-shadow: 0 0 10px rgba(57,255,20,0.8), 0 0 20px rgba(255,211,0,0.06);
-  animation-name: dropFall;
-  animation-timing-function: linear;
-  animation-iteration-count: infinite;
-  opacity: 0.95;
-}
-@keyframes radFloat {
-  0%   { transform: translateY(0px) rotate(0deg);   opacity: .75; }
-  50%  { transform: translateY(16px) rotate(180deg); opacity: 1; }
-  100% { transform: translateY(0px) rotate(360deg);  opacity: .75; }
-}
-.bg-radio {
-  position: absolute;
-  color: #FFD300;
-  text-shadow: 0 0 12px #FF7518, 0 0 24px #FF3131;
-  animation-name: radFloat;
-  animation-iteration-count: infinite;
-  animation-timing-function: ease-in-out;
-  opacity: 0.95;
-}
-.hazard-bar {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  height: 26px;
-  background: repeating-linear-gradient(
-    -45deg,
-    #FFD300,
-    #FFD300 20px,
-    #000000 20px,
-    #000000 40px
-  );
-  z-index: 1;
-  opacity: 0.22;
-  pointer-events: none;
-}
 </style>
 """
 
-overlay_html = f"""
-<div class="bg-overlay">
-  {drops_html}
-  {rad_html}
-  {hazard_html}
-</div>
-"""
-
-st.markdown(css_block + overlay_html, unsafe_allow_html=True)
+st.markdown(css_block, unsafe_allow_html=True)
 
 # ================= FUNCTIONS =================
 def predict_contamination(ph, tds, hardness, nitrate):
