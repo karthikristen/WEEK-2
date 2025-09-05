@@ -233,7 +233,7 @@ with tabs[1]:
 # ---- TAB 3 ----
 with tabs[2]:
     st.subheader("⚠️ Dangers of Radioactive Water")
-    st.image("radioactive_process", caption="Radioactive Contamination Process")  # <-- Your saved anime-style image
+    st.image("radioactive_process.png", caption="Radioactive Contamination Process")  # <-- Your saved anime-style image
     st.write("""
     - ☢️ Radioactive water exposure can cause **cancer, organ damage, and genetic mutations**.  
     - ☠️ Animals and plants also suffer from **biological accumulation** of radioactive isotopes.  
@@ -242,4 +242,5 @@ with tabs[2]:
 
 st.markdown("---")
 st.markdown('<p style="text-align:center; color:#FFD300;">👨‍💻 Developed by Karthikeyan</p>', unsafe_allow_html=True)
+
 
