@@ -5,105 +5,116 @@ import random
 
 # ------------------- CUSTOM CSS -------------------
 st.markdown("""
-    <style>
-    /* ----- BODY & GRADIENT ANIMATION ----- */
-    body {
-        background: linear-gradient(-45deg, #000000, #0d0d0d, #39FF14, #000000);
-        background-size: 400% 400%;
-        animation: gradientBG 20s ease infinite;
-        color: #39FF14;
-        font-family: monospace;
-    }
-    @keyframes gradientBG {
-        0% { background-position: 0% 50%; }
-        50% { background-position: 100% 50%; }
-        100% { background-position: 0% 50%; }
-    }
+<style>
+/* ----- BODY & OLIVE GREEN GRADIENT ----- */
+body {
+    background: linear-gradient(-45deg, #556B2F, #6B8E23, #808000, #556B2F);
+    background-size: 400% 400%;
+    animation: gradientBG 20s ease infinite;
+    color: #39FF14;
+    font-family: monospace;
+}
+@keyframes gradientBG {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
 
-    /* ----- GLOWING TABS ----- */
-    .stTabs [role="tablist"] button {
-        background: #111 !important;
-        color: #39FF14 !important;
-        border-radius: 10px;
-        border: 1px solid #39FF14;
-        margin-right: 5px;
-        transition: all 0.3s ease-in-out;
-    }
-    .stTabs [role="tablist"] button:hover,
-    .stTabs [role="tablist"] button:focus {
-        background: #39FF14 !important;
-        color: black !important;
-        box-shadow: 0 0 20px #39FF14, 0 0 40px #39FF14;
-        transform: scale(1.1);
-    }
+/* ----- GLOWING TABS ----- */
+.stTabs [role="tablist"] button {
+    background: #3B5323 !important;
+    color: #39FF14 !important;
+    border-radius: 10px;
+    border: 1px solid #39FF14;
+    margin-right: 5px;
+    transition: all 0.3s ease-in-out;
+}
+.stTabs [role="tablist"] button:hover,
+.stTabs [role="tablist"] button:focus {
+    background: #39FF14 !important;
+    color: black !important;
+    box-shadow: 0 0 20px #39FF14, 0 0 40px #39FF14;
+    transform: scale(1.1);
+}
 
-    /* ----- GLOWING HEADINGS ----- */
-    h1, h2, h3, h4 {
-        animation: glowText 2s ease-in-out infinite alternate;
-    }
-    @keyframes glowText {
-        0% { text-shadow: 0 0 5px #39FF14; }
-        100% { text-shadow: 0 0 20px #39FF14, 0 0 30px #39FF14; }
-    }
+/* ----- GLOWING HEADINGS ----- */
+h1, h2, h3, h4 {
+    animation: glowText 2s ease-in-out infinite alternate;
+}
+@keyframes glowText {
+    0% { text-shadow: 0 0 5px #39FF14; }
+    100% { text-shadow: 0 0 20px #39FF14, 0 0 30px #39FF14; }
+}
 
-    /* ----- GLOWING INPUTS ----- */
-    input, .stNumberInput, .stTextInput input {
-        background: #111 !important;
-        color: #39FF14 !important;
-        border: 1px solid #39FF14 !important;
-        border-radius: 5px;
-        box-shadow: 0 0 10px #39FF14;
-    }
+/* ----- GLOWING INPUTS ----- */
+input, .stNumberInput, .stTextInput input {
+    background: #3B5323 !important;
+    color: #39FF14 !important;
+    border: 1px solid #39FF14 !important;
+    border-radius: 5px;
+    box-shadow: 0 0 10px #39FF14;
+}
 
-    /* ----- GLOWING BUTTONS ----- */
-    button {
-        background: #111 !important;
-        color: #39FF14 !important;
-        border: 1px solid #39FF14 !important;
-        border-radius: 10px;
-        transition: 0.3s all;
-    }
-    button:hover {
-        background: #39FF14 !important;
-        color: black !important;
-        box-shadow: 0 0 20px #39FF14;
-        transform: scale(1.1);
-    }
+/* ----- GLOWING BUTTONS ----- */
+button {
+    background: #3B5323 !important;
+    color: #39FF14 !important;
+    border: 1px solid #39FF14 !important;
+    border-radius: 10px;
+    transition: 0.3s all;
+}
+button:hover {
+    background: #39FF14 !important;
+    color: black !important;
+    box-shadow: 0 0 20px #39FF14;
+    transform: scale(1.1);
+}
 
-    /* ----- WATER / PARTICLE EFFECTS ----- */
-    @keyframes drop {
-        0% { top: -20px; opacity: 0; }
-        30% { opacity: 1; }
-        100% { top: 100vh; opacity: 0; }
-    }
-    .particle {
-        position: fixed;
-        top: -20px;
-        border-radius: 50%;
-        z-index: -1;
-        opacity: 0.8;
-        background: #39FF14;
-    }
+/* ----- FALLING DROPLETS ----- */
+@keyframes drop {
+    0% { top: -20px; opacity: 0; }
+    30% { opacity: 1; }
+    100% { top: 2000px; opacity: 0; }
+}
+.droplet {
+    position: absolute;  /* scrolls with content */
+    width: 4px;
+    height: 15px;
+    background: #39FF14;
+    border-radius: 50%;
+    animation: drop 5s linear infinite;
+}
 
-    /* ----- FLOATING RADIOACTIVE ICONS ----- */
-    @keyframes floatY {
-        0% { transform: translateY(0px);}
-        50% { transform: translateY(-15px);}
-        100% { transform: translateY(0px);}
-    }
-    </style>
+/* ----- FLOATING RADIOACTIVE ICONS ----- */
+@keyframes floatY {
+    0% { transform: translateY(0px);}
+    50% { transform: translateY(-15px);}
+    100% { transform: translateY(0px);}
+}
+</style>
 """, unsafe_allow_html=True)
 
-# ----- Generate falling water droplets -----
+# Container div for scrollable droplets
+st.markdown('<div class="container" style="position:relative; width:100%; height:2000px;">', unsafe_allow_html=True)
+
+# Generate multiple scrollable droplets
 for i in range(50):
     left = random.randint(0, 95)
     delay = random.uniform(0, 5)
-    duration = random.uniform(3, 7)
+    duration = random.uniform(3, 8)
     width = random.randint(2, 6)
     height = random.randint(10, 20)
     st.markdown(f"""
-        <div class='particle' style='left:{left}%; width:{width}px; height:{height}px; animation: drop {duration}s linear {delay}s infinite;'></div>
+    <div class="droplet" style="
+        left:{left}%;
+        width:{width}px;
+        height:{height}px;
+        animation-delay:{delay}s;
+        animation-duration:{duration}s;
+    "></div>
     """, unsafe_allow_html=True)
+
+st.markdown('</div>', unsafe_allow_html=True)
 
 # ------------------- PREDICTION FUNCTION -------------------
 def predict_contamination(ph, tds, hardness, nitrate):
@@ -129,19 +140,12 @@ def show_risk_gauge(score):
                 {'range': [0, 30], 'color': "lightgreen"},
                 {'range': [30, 60], 'color': "yellow"},
                 {'range': [60, 100], 'color': "red"}
-            ],
-            'threshold': {
-                'line': {'color': "red", 'width': 4},
-                'thickness': 0.75,
-                'value': score
-            }
+            ]
         }
     ))
-    fig.update_layout(
-        paper_bgcolor='rgba(0,0,0,0)',
-        font={'color': "#39FF14", 'family': "monospace"},
-        transition={'duration': 1000, 'easing': 'cubic-in-out'}
-    )
+    fig.update_layout(paper_bgcolor='rgba(0,0,0,0)',
+                      font={'color': "#39FF14", 'family': "monospace"},
+                      transition={'duration': 1000, 'easing': 'cubic-in-out'})
     st.plotly_chart(fig, use_container_width=True)
 
 # ------------------- RISK MESSAGE -------------------
@@ -205,7 +209,6 @@ with tabs[1]:
     st.subheader("📊 Safe vs Unsafe Water Levels (Futuristic View)")
     safe_limits = {"pH": (6.5, 8.5), "TDS": (0, 500), "Hardness": (0, 200), "Nitrate": (0, 45)}
     params = list(safe_limits.keys())
-    min_values = [0,0,0,0]
     max_values = [14,2000,1000,500]
     safe_max = [safe_limits[p][1] for p in params]
 
@@ -226,8 +229,8 @@ with tabs[2]:
         left = random.randint(0, 90)
         delay = random.uniform(0, 3)
         st.markdown(f"""
-        <div style='position: fixed; top: {random.randint(10, 80)}%; left:{left}%;
-                    font-size:30px; color:red; animation: floatY 4s ease-in-out {delay}s infinite; z-index:-1;'>
+        <div style='position: absolute; top: {random.randint(10, 80)}%; left:{left}%;
+                    font-size:30px; color:red; animation: floatY 4s ease-in-out {delay}s infinite;'>
             ☢️
         </div>
         """, unsafe_allow_html=True)
