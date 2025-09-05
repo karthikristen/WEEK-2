@@ -24,7 +24,7 @@ html, body, [class*="css"] {
 /* Title & Subtitle */
 h1.app-title {
   text-align: center;
-  color: #FFD300;
+  color: #FFD300; /* Yellow radioactive title */
   font-size: 52px;
   margin-bottom: 4px;
   text-shadow: 0 0 10px #FFD300, 0 0 28px #FF7518;
@@ -74,6 +74,7 @@ p.app-sub {
 }
 </style>
 """
+
 st.markdown(css_block, unsafe_allow_html=True)
 
 # ================= FUNCTIONS =================
@@ -85,7 +86,7 @@ def predict_contamination(ph, tds, hardness, nitrate):
     if nitrate > 45: score += 25
     return score
 
-def show_risk_gauge(score, key=None):
+def show_risk_gauge(score):
     fig = go.Figure(go.Indicator(
         mode="gauge+number",
         value=score,
@@ -100,7 +101,39 @@ def show_risk_gauge(score, key=None):
             ],
         }
     ))
-    st.plotly_chart(fig, use_container_width=True, key=key)
+    st.plotly_chart(fig, use_container_width=True)
+
+def show_safety_graph(ph, tds, hardness, nitrate):
+    safe_ranges = {
+        "pH": (6.5, 8.5),
+        "TDS": (0, 500),
+        "Hardness": (0, 200),
+        "Nitrate": (0, 45),
+    }
+    values = {"pH": ph, "TDS": tds, "Hardness": hardness, "Nitrate": nitrate}
+
+    fig = go.Figure()
+    for param, (low, high) in safe_ranges.items():
+        fig.add_trace(go.Bar(
+            x=[param],
+            y=[values[param]],
+            name=f"{param} Value",
+            marker_color="red" if values[param] < low or values[param] > high else "green"
+        ))
+        fig.add_trace(go.Bar(
+            x=[param],
+            y=[high],
+            name=f"{param} Safe Max",
+            marker_color="lightgreen",
+            opacity=0.5
+        ))
+
+    fig.update_layout(
+        title="Water Quality vs Safe Ranges",
+        barmode="overlay",
+        yaxis_title="Levels (mg/L or pH)"
+    )
+    st.plotly_chart(fig, use_container_width=True)
 
 # ================= UI =================
 st.markdown("<h1 class='app-title'>💧☢️ Radioactive Water Contamination Detector</h1>", unsafe_allow_html=True)
@@ -129,7 +162,7 @@ with tabs[0]:
             result = '<p class="glow-red">☢️ High Risk: Potential radioactive contamination detected!</p>'
 
         st.markdown(result, unsafe_allow_html=True)
-        show_risk_gauge(score, key="overall_risk_gauge")
+        show_risk_gauge(score)
 
         # Save dataset
         new_data = pd.DataFrame([[location, ph, tds, hardness, nitrate, score]],
@@ -149,15 +182,6 @@ with tabs[0]:
 with tabs[1]:
     st.subheader("📊 Safe vs Unsafe Water Levels")
 
-    # Function to calculate mini risk per parameter
-    def param_risk(value, low, high):
-        if low <= value <= high:
-            return 0
-        elif value < low:
-            return min(100, int((low - value) / low * 100))
-        else:
-            return min(100, int((value - high) / high * 100))
-
     safe_ranges = {
         "pH": (6.5, 8.5, ph),
         "TDS (mg/L)": (0, 500, tds),
@@ -166,9 +190,9 @@ with tabs[1]:
     }
 
     for param, (low, high, value) in safe_ranges.items():
-        col1, col2, col3 = st.columns([1.1, 1.0, 0.7])
+        col1, col2, col3 = st.columns([1.1, 1.0, 0.7])  # Graph + value + risk
 
-        # Small Bar Graph
+        # ---- Small Bar Graph ----
         with col1:
             fig = go.Figure()
             fig.add_trace(go.Bar(
@@ -177,6 +201,7 @@ with tabs[1]:
                 name=f"{param} Value",
                 marker_color="red" if value < low or value > high else "#39FF14"
             ))
+            # Safe range overlay
             fig.add_shape(
                 type="rect",
                 x0=-0.5, x1=0.5,
@@ -190,9 +215,9 @@ with tabs[1]:
                 height=200, width=200,
                 margin=dict(l=15, r=15, t=35, b=15)
             )
-            st.plotly_chart(fig, use_container_width=False, key=f"bar_{param}")
+            st.plotly_chart(fig, use_container_width=False)
 
-        # Display Value
+        # ---- Display Value ----
         with col2:
             st.markdown(
                 f"""
@@ -205,28 +230,14 @@ with tabs[1]:
                 unsafe_allow_html=True
             )
 
-        # Mini Gauge
+        # ---- Parameter Risk ----
         with col3:
-            score = param_risk(value, low, high)
-            fig_gauge = go.Figure(go.Indicator(
-                mode="gauge+number",
-                value=score,
-                number={'suffix': "%", 'font': {'size': 16}},
-                gauge={
-                    'axis': {'range': [0, 100]},
-                    'bar': {'color': "red" if score >= 60 else "orange" if score >= 30 else "#39FF14"},
-                    'steps': [
-                        {'range': [0, 30], 'color': "#39FF14"},
-                        {'range': [30, 60], 'color': "yellow"},
-                        {'range': [60, 100], 'color': "red"}
-                    ],
-                }
-            ))
-            fig_gauge.update_layout(
-                height=180,
-                margin=dict(l=0, r=0, t=10, b=10)
+            status = "✅ Safe" if low <= value <= high else "⚠️ Unsafe"
+            color = "#39FF14" if low <= value <= high else "red"
+            st.markdown(
+                f"<div style='font-size:18px; color:{color};'><b>{status}</b></div>",
+                unsafe_allow_html=True
             )
-            st.plotly_chart(fig_gauge, use_container_width=False, key=f"gauge_{param}")
 
     st.info("ℹ️ Compare your water parameters above with the WHO safe ranges.")
 
