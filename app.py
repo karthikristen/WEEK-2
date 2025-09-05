@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import plotly.graph_objects as go
 
-# ------------------- CUSTOM CSS -------------------
+# ------------------- BACKGROUND CSS + ELEMENTS -------------------
 st.markdown("""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap');
@@ -82,6 +82,7 @@ st.markdown("""
         height: 100%;
         overflow: hidden;
         z-index: -2;
+        pointer-events: none;
     }
     .water-drop {
         position: absolute;
@@ -106,6 +107,7 @@ st.markdown("""
         text-shadow: 0 0 15px #FF7518, 0 0 30px #FF3131;
         animation: spin 8s linear infinite;
         z-index: -1;
+        pointer-events: none;
     }
     @keyframes spin {
         from { transform: rotate(0deg); }
@@ -134,25 +136,20 @@ st.markdown("""
         100% { background-position: 100px 0; }
     }
     </style>
+
+    <!-- DROPS -->
+    <div class='drop-container'>
+        """ + "".join([f"<div class='water-drop' style='left:{i*4}%; animation-delay:{i*0.5}s;'></div>" for i in range(25)]) + """
+    </div>
+
+    <!-- RADIATION SYMBOLS -->
+    <div class='radiation' style='top:10%; left:5%;'>☢️</div>
+    <div class='radiation' style='top:70%; left:80%; font-size:50px;'>☢️</div>
+    <div class='radiation' style='top:40%; left:60%; font-size:30px;'>☢️</div>
+
+    <!-- HAZARD BAR -->
+    <div class='hazard-bar'></div>
 """, unsafe_allow_html=True)
-
-# ------------------- WATER DROPS (NO EXTRA SPACE) -------------------
-drop_html = "<div class='drop-container'>"
-for i in range(25):  # number of drops
-    drop_html += f"<div class='water-drop' style='left:{i*4}%; animation-delay:{i*0.5}s;'></div>"
-drop_html += "</div>"
-st.markdown(drop_html, unsafe_allow_html=True)
-
-# ------------------- Radiation symbols -------------------
-symbols = """
-<div class='radiation' style='top:10%; left:5%;'>☢️</div>
-<div class='radiation' style='top:70%; left:80%; font-size:50px;'>☢️</div>
-<div class='radiation' style='top:40%; left:60%; font-size:30px;'>☢️</div>
-"""
-st.markdown(symbols, unsafe_allow_html=True)
-
-# ------------------- Hazard bar -------------------
-st.markdown("<div class='hazard-bar'></div>", unsafe_allow_html=True)
 
 # ------------------- PREDICTION FUNCTION -------------------
 def predict_contamination(ph, tds, hardness, nitrate):
