@@ -66,16 +66,30 @@ st.markdown("<h1 class='title'>☢️ Radioactive Water Contamination Detector</
 st.markdown("<h3 class='subtitle'>Futuristic AI/ML Powered System | Developed by Karthikeyan</h3>", unsafe_allow_html=True)
 
 # ===================== SIDEBAR INPUTS =====================
-st.sidebar.header("🔍 Enter Water Parameters")
-ph = st.sidebar.slider("pH Level", 0.0, 14.0, 7.0)
-tds = st.sidebar.slider("TDS (mg/L)", 0, 2000, 300)
-hardness = st.sidebar.slider("Hardness (mg/L)", 0, 1000, 200)
-nitrate = st.sidebar.slider("Nitrate (mg/L)", 0, 100, 20)
+st.sidebar.header("🔍 Enter Water Parameters (Sliders)")
+ph_slider = st.sidebar.slider("pH Level", 0.0, 14.0, 7.0)
+tds_slider = st.sidebar.slider("TDS (mg/L)", 0, 2000, 300)
+hardness_slider = st.sidebar.slider("Hardness (mg/L)", 0, 1000, 200)
+nitrate_slider = st.sidebar.slider("Nitrate (mg/L)", 0, 100, 20)
+
+# ===================== CENTER INPUTS =====================
+st.markdown("### 🎛️ Manual Input Controls (with +/- buttons)")
+
+col1, col2, col3, col4 = st.columns(4)
+
+with col1:
+    ph = st.number_input("pH", min_value=0.0, max_value=14.0, value=ph_slider, step=0.1)
+with col2:
+    tds = st.number_input("TDS", min_value=0, max_value=2000, value=tds_slider, step=10)
+with col3:
+    hardness = st.number_input("Hardness", min_value=0, max_value=1000, value=hardness_slider, step=10)
+with col4:
+    nitrate = st.number_input("Nitrate", min_value=0, max_value=100, value=nitrate_slider, step=1)
 
 # ===================== TABS =====================
-tab1, tab2, tab3 = st.tabs(["🧪 Contamination Check", "📊 Safety Meter", "⚠️ Radioactive Awareness"])
+tab1, tab2, tab3 = st.tabs(["🧪 Contamination Check + Safety Meter", "📊 Data Overview", "⚠️ Radioactive Awareness"])
 
-# -------- TAB 1: Contamination Check --------
+# -------- TAB 1: Contamination Check + Safety Meter --------
 with tab1:
     st.subheader("Water Quality Results")
     safe = True
@@ -97,8 +111,7 @@ with tab1:
     else:
         st.warning("⚠️ Water is contaminated")
 
-# -------- TAB 2: Safety Meter --------
-with tab2:
+    # Safety Gauge Moved Here
     st.subheader("Safety Gauge")
     score = 100
     if not (6.5 <= ph <= 8.5):
@@ -122,7 +135,15 @@ with tab2:
                    {'range': [75, 100], 'color': "green"}]}))
     st.plotly_chart(fig, use_container_width=True)
 
-# -------- TAB 3: Radioactive Awareness --------
+# -------- TAB 2: Data Overview --------
+with tab2:
+    st.subheader("Current Input Values")
+    st.write(f"pH: {ph}")
+    st.write(f"TDS: {tds} mg/L")
+    st.write(f"Hardness: {hardness} mg/L")
+    st.write(f"Nitrate: {nitrate} mg/L")
+
+# -------- TAB 3: Awareness --------
 with tab3:
     st.subheader("Awareness Info")
     st.write("""
