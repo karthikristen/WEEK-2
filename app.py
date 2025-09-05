@@ -189,41 +189,52 @@ with tabs[1]:
     }
 
     for param, (low, high, value) in safe_ranges.items():
-        col1, col2 = st.columns([1.1, 1.0])  # small graph + value side by side
+        col1, col2, col3 = st.columns([1.1, 1.0, 0.7])  # Graph + value + risk
 
+        # ---- Small Bar Graph ----
         with col1:
             fig = go.Figure()
             fig.add_trace(go.Bar(
                 x=[param],
                 y=[value],
                 name=f"{param} Value",
-                marker_color="red" if value < low or value > high else "green"
+                marker_color="red" if value < low or value > high else "#39FF14"
             ))
+            # Safe range overlay
             fig.add_shape(
                 type="rect",
                 x0=-0.5, x1=0.5,
                 y0=low, y1=high,
-                fillcolor="lightgreen",
-                opacity=0.3,
+                fillcolor="rgba(57,255,20,0.2)",
                 line_width=0
             )
             fig.update_layout(
                 title=f"{param} Level",
                 barmode="overlay",
-                height=220, width=220,  # make graphs small
-                margin=dict(l=20, r=20, t=40, b=20)
+                height=200, width=200,
+                margin=dict(l=15, r=15, t=35, b=15)
             )
             st.plotly_chart(fig, use_container_width=False)
 
+        # ---- Display Value ----
         with col2:
             st.markdown(
                 f"""
-                <div style="font-size:18px; color:#FFD300;">
+                <div style="font-size:16px; color:#FFD300;">
                 <b>{param}</b><br>
-                ✅ Safe Range: {low} – {high}<br>
-                💧 Your Value: <span style="color:{'red' if value < low or value > high else 'lightgreen'};">{value}</span>
+                Safe Range: {low} – {high}<br>
+                Your Value: <span style="color:{'red' if value < low or value > high else '#39FF14'};">{value}</span>
                 </div>
                 """,
+                unsafe_allow_html=True
+            )
+
+        # ---- Parameter Risk ----
+        with col3:
+            status = "✅ Safe" if low <= value <= high else "⚠️ Unsafe"
+            color = "#39FF14" if low <= value <= high else "red"
+            st.markdown(
+                f"<div style='font-size:18px; color:{color};'><b>{status}</b></div>",
                 unsafe_allow_html=True
             )
 
@@ -242,5 +253,6 @@ with tabs[2]:
 
 st.markdown("---")
 st.markdown('<p style="text-align:center; color:#FFD300;">👨‍💻 Developed by Karthikeyan</p>', unsafe_allow_html=True)
+
 
 
