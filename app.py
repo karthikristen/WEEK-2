@@ -272,6 +272,14 @@ with tabs[2]:
 
     st.info("ℹ️ Stay informed and take action to ensure safe drinking water.")
 
-# Footer
-st.markdown("---")
-st.markdown('<p style="text-align:center; color:#FFD300;">👨‍💻 Developed by Karthikeyan</p>', unsafe_allow_html=True)
+# Connect Section
+st.markdown("""
+<div style="text-align:center; margin-top:10px;">
+    <p style="color:#FFD300; font-size:16px;">
+        Connect with me: 
+        <a href="https://www.linkedin.com/in/karthikeyan-t-82a86931a" target="_blank" style="color:#00FF7F;">LinkedIn</a> | 
+        <a href="mailto:karthikeyant1885@gmail.com" style="color:#00FF7F;">Email</a>
+    </p>
+</div>
+""", unsafe_allow_html=True)
+
