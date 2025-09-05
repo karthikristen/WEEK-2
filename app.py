@@ -190,39 +190,56 @@ with tabs[1]:
 
 # ---- TAB 3 ----
 with tabs[2]:
-    st.subheader("⚠️ Radioactive Water Awareness")
-    st.image("radioactive_process.png", caption="Radioactive Contamination Process", use_container_width=True)
+    st.subheader("⚠️ Dangers of Radioactive Water")
+    st.image("radioactive_process.png", caption="Radioactive Contamination Process", use_column_width=True)
 
-    awareness_html = """
-    <div style="background-color:#111111; padding:15px; border-radius:12px; color:#e8f5e9;">
-        <h4 style="color:#FFD300;">☢️ Health Risks</h4>
-        <ul>
-            <li><b>Cancer:</b> Long-term exposure. <a href="https://ensia.com/features/radioactive-contamination-drinking-water-radium-radon-uranium/?utm_source=chatgpt.com" target="_blank" style="color:#39FF14;">[Read More]</a></li>
-            <li><b>Organ Damage:</b> Kidney & liver dysfunction. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC3261972/?utm_source=chatgpt.com" target="_blank" style="color:#39FF14;">[Study]</a></li>
-            <li><b>Genetic Mutations:</b> Can affect future generations. <a href="https://link.springer.com/chapter/10.1007/978-3-031-89591-3_10?utm_source=chatgpt.com" target="_blank" style="color:#39FF14;">[Reference]</a></li>
-        </ul>
+    sections = [
+        {
+            "title": "☢️ Health Risks",
+            "title_color": "#FFD700",
+            "content": [
+                ('Cancer: Long-term exposure to radioactive elements can increase cancer risk.', "https://ensia.com/features/radioactive-contamination-drinking-water-radium-radon-uranium/?utm_source=chatgpt.com"),
+                ('Organ Damage: Kidney and liver dysfunction may occur.', "https://pmc.ncbi.nlm.nih.gov/articles/PMC3261972/?utm_source=chatgpt.com"),
+                ('Genetic Mutations: Can affect future generations.', "https://link.springer.com/chapter/10.1007/978-3-031-89591-3_10?utm_source=chatgpt.com")
+            ]
+        },
+        {
+            "title": "🌍 Environmental Impact",
+            "title_color": "#FFD700",
+            "content": [
+                ('Bioaccumulation: Radioactive isotopes accumulate in plants & animals.', "https://ensia.com/features/radioactive-contamination-drinking-water-radium-radon-uranium/?utm_source=chatgpt.com"),
+                ('Ecosystem Disruption: Contaminated water affects biodiversity.', None)
+            ]
+        },
+        {
+            "title": "🛡️ WHO Guidelines",
+            "title_color": "#FFD700",
+            "content": [
+                ('WHO Guidelines for Drinking-water Quality', "https://apps.who.int/iris/bitstream/handle/10665/44584/9789241548151_eng.pdf?utm_source=chatgpt.com"),
+                ('Chapter 9: Radiological Aspects', "https://cdn.who.int/media/docs/default-source/wash-documents/water-safety-and-quality/dwq-guidelines-4/gdwq4-with-add1-chap9.pdf?sfvrsn=6fc78cae_3&utm_source=chatgpt.com")
+            ]
+        },
+        {
+            "title": "📚 Further Reading",
+            "title_color": "#FFD700",
+            "content": [
+                ('Health Effects of Naturally Radioactive Water Ingestion', "https://pmc.ncbi.nlm.nih.gov/articles/PMC3261972/?utm_source=chatgpt.com"),
+                ('Radioactive Contaminants in Drinking Water and Their Health Effects', "https://www.ncbi.nlm.nih.gov/books/NBK234160/?utm_source=chatgpt.com")
+            ]
+        }
+    ]
 
-        <h4 style="color:#FF7518;">🌍 Environmental Impact</h4>
-        <ul>
-            <li><b>Bioaccumulation:</b> Radioactive isotopes accumulate in plants & animals. <a href="https://ensia.com/features/radioactive-contamination-drinking-water-radium-radon-uranium/?utm_source=chatgpt.com" target="_blank" style="color:#39FF14;">[Read More]</a></li>
-            <li><b>Ecosystem Disruption:</b> Contaminated water affects biodiversity.</li>
-        </ul>
+    for sec in sections:
+        html_content = f'<div style="background-color:#111111; padding:15px; border-radius:12px; margin-bottom:10px;">'
+        html_content += f'<h4 style="color:{sec["title_color"]};">{sec["title"]}</h4><ul style="color:#f0f0f0;">'
+        for text, link in sec["content"]:
+            if link:
+                html_content += f'<li>{text} <a href="{link}" target="_blank" style="color:#00FF7F;">[Read More]</a></li>'
+            else:
+                html_content += f'<li>{text}</li>'
+        html_content += '</ul></div>'
+        st.markdown(html_content, unsafe_allow_html=True)
 
-        <h4 style="color:#39FF14;">🛡️ WHO Guidelines</h4>
-        <ul>
-            <li><a href="https://apps.who.int/iris/bitstream/handle/10665/44584/9789241548151_eng.pdf?utm_source=chatgpt.com" target="_blank" style="color:#FFD300;"><b>WHO Guidelines for Drinking-water Quality</b></a></li>
-            <li><a href="https://cdn.who.int/media/docs/default-source/wash-documents/water-safety-and-quality/dwq-guidelines-4/gdwq4-with-add1-chap9.pdf?sfvrsn=6fc78cae_3&utm_source=chatgpt.com" target="_blank" style="color:#FFD300;"><b>Chapter 9: Radiological Aspects</b></a></li>
-        </ul>
-
-        <h4 style="color:#FFD300;">📚 Further Reading</h4>
-        <ul>
-            <li><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC3261972/?utm_source=chatgpt.com" target="_blank" style="color:#39FF14;">Health Effects of Naturally Radioactive Water Ingestion</a></li>
-            <li><a href="https://www.ncbi.nlm.nih.gov/books/NBK234160/?utm_source=chatgpt.com" target="_blank" style="color:#39FF14;">Radioactive Contaminants in Drinking Water and Their Health Effects</a></li>
-        </ul>
-    </div>
-    """
-
-    st.markdown(awareness_html, unsafe_allow_html=True)
     st.info("ℹ️ Stay informed and take action to ensure safe drinking water.")
 
 # Footer
