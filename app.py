@@ -181,6 +181,15 @@ with tabs[0]:
 with tabs[1]:
     st.subheader("📊 Safe vs Unsafe Water Levels")
 
+    # Function to calculate mini risk for each parameter
+    def param_risk(value, low, high):
+        if low <= value <= high:
+            return 0
+        elif value < low:
+            return min(100, int((low - value) / low * 100))
+        else:
+            return min(100, int((value - high) / high * 100))
+
     safe_ranges = {
         "pH": (6.5, 8.5, ph),
         "TDS (mg/L)": (0, 500, tds),
@@ -189,7 +198,7 @@ with tabs[1]:
     }
 
     for param, (low, high, value) in safe_ranges.items():
-        col1, col2, col3 = st.columns([1.1, 1.0, 0.7])  # Graph + value + risk
+        col1, col2, col3 = st.columns([1.1, 1.0, 0.7])  # Graph + value + mini gauge
 
         # ---- Small Bar Graph ----
         with col1:
@@ -200,7 +209,6 @@ with tabs[1]:
                 name=f"{param} Value",
                 marker_color="red" if value < low or value > high else "#39FF14"
             ))
-            # Safe range overlay
             fig.add_shape(
                 type="rect",
                 x0=-0.5, x1=0.5,
@@ -229,17 +237,28 @@ with tabs[1]:
                 unsafe_allow_html=True
             )
 
-        # ---- Parameter Risk ----
+        # ---- Mini Risk Gauge ----
         with col3:
-            status = "✅ Safe" if low <= value <= high else "⚠️ Unsafe"
-            color = "#39FF14" if low <= value <= high else "red"
-            st.markdown(
-                f"<div style='font-size:18px; color:{color};'><b>{status}</b></div>",
-                unsafe_allow_html=True
+            score = param_risk(value, low, high)
+            fig_gauge = go.Figure(go.Indicator(
+                mode="gauge+number",
+                value=score,
+                number={'suffix': "%", 'font': {'size': 16}},
+                gauge={
+                    'axis': {'range': [0, 100]},
+                    'bar': {'color': "red" if score >= 60 else "orange" if score >= 30 else "#39FF14"},
+                    'steps': [
+                        {'range': [0, 30], 'color': "#39FF14"},
+                        {'range': [30, 60], 'color': "yellow"},
+                        {'range': [60, 100], 'color': "red"}
+                    ],
+                }
+            ))
+            fig_gauge.update_layout(
+                height=180,
+                margin=dict(l=0, r=0, t=10, b=10)
             )
-
-    st.info("ℹ️ Compare your water parameters above with the WHO safe ranges.")
-
+            st.plotly_chart(fig_gauge, use_container_width=False)
 
 # ---- TAB 3 ----
 with tabs[2]:
@@ -253,6 +272,7 @@ with tabs[2]:
 
 st.markdown("---")
 st.markdown('<p style="text-align:center; color:#FFD300;">👨‍💻 Developed by Karthikeyan</p>', unsafe_allow_html=True)
+
 
 
 
