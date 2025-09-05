@@ -10,18 +10,14 @@ css_block = """
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap');
 
-/* General App Styling */
+* {
+  font-family: 'Bebas Neue', sans-serif !important;
+}
+
 html, body, [class*="css"] {
-  font-family: 'Bebas Neue', cursive;
   background-color: #0a0a0a;
   color: #e8f5e9;
   min-height: 100vh;
-}
-
-/* Ensure content stays on top */
-.block-container, .main {
-  position: relative;
-  z-index: 2;
 }
 
 /* Title & Subtitle */
@@ -106,6 +102,38 @@ def show_risk_gauge(score):
     ))
     st.plotly_chart(fig, use_container_width=True)
 
+def show_safety_graph(ph, tds, hardness, nitrate):
+    safe_ranges = {
+        "pH": (6.5, 8.5),
+        "TDS": (0, 500),
+        "Hardness": (0, 200),
+        "Nitrate": (0, 45),
+    }
+    values = {"pH": ph, "TDS": tds, "Hardness": hardness, "Nitrate": nitrate}
+
+    fig = go.Figure()
+    for param, (low, high) in safe_ranges.items():
+        fig.add_trace(go.Bar(
+            x=[param],
+            y=[values[param]],
+            name=f"{param} Value",
+            marker_color="red" if values[param] < low or values[param] > high else "green"
+        ))
+        fig.add_trace(go.Bar(
+            x=[param],
+            y=[high],
+            name=f"{param} Safe Max",
+            marker_color="lightgreen",
+            opacity=0.5
+        ))
+
+    fig.update_layout(
+        title="Water Quality vs Safe Ranges",
+        barmode="overlay",
+        yaxis_title="Levels (mg/L or pH)"
+    )
+    st.plotly_chart(fig, use_container_width=True)
+
 # ================= UI =================
 st.markdown("<h1 class='app-title'>💧☢️ Radioactive Water Contamination Detector</h1>", unsafe_allow_html=True)
 st.markdown("<p class='app-sub'>Futuristic AI/ML Powered System | Developed by Karthikeyan</p>", unsafe_allow_html=True)
@@ -152,18 +180,12 @@ with tabs[0]:
 # ---- TAB 2 ----
 with tabs[1]:
     st.subheader("📊 Safe vs Unsafe Water Levels")
-    st.image("radioactive_process.png", caption="Process of Radioactive Materials in Groundwater")
-    st.write("""
-    - ✅ pH: 6.5 – 8.5  
-    - ✅ TDS: < 500 mg/L  
-    - ✅ Hardness: < 200 mg/L  
-    - ✅ Nitrate: < 45 mg/L  
-    """)
+    show_safety_graph(ph, tds, hardness, nitrate)
 
 # ---- TAB 3 ----
 with tabs[2]:
     st.subheader("⚠️ Dangers of Radioactive Water")
-    st.image("radioactive_process.png", caption="Radioactive Waste Warning")
+    st.image("An_educational_infographic.png", caption="Radioactive Contamination Process")  # <-- Your saved anime-style image
     st.write("""
     - ☢️ Radioactive water exposure can cause **cancer, organ damage, and genetic mutations**.  
     - ☠️ Animals and plants also suffer from **biological accumulation** of radioactive isotopes.  
