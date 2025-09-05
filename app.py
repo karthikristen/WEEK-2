@@ -4,6 +4,13 @@ import plotly.graph_objects as go
 import os
 import time
 
+# ================= GOOGLE SITE VERIFICATION =================
+st.markdown("""
+<head>
+    <meta name="google-site-verification" content="google428314d1749adc2d" />
+</head>
+""", unsafe_allow_html=True)
+
 # ================= PAGE CONFIG =================
 st.set_page_config(page_title="Radioactive Water Contamination Detector", layout="wide")
 
@@ -152,7 +159,6 @@ with tabs[1]:
 
     params = list(safe_ranges.items())
 
-    # Display 2 parameters per row
     for i in range(0, len(params), 2):
         cols = st.columns(2)
         for j, col in enumerate(cols):
@@ -161,7 +167,7 @@ with tabs[1]:
             param, (low, high, value) = params[i + j]
 
             with col:
-                subcols = st.columns([1.1, 1.0, 0.7])  # Graph + value + status
+                subcols = st.columns([1.1, 1.0, 0.7])
 
                 # Small Bar Graph
                 with subcols[0]:
