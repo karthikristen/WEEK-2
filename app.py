@@ -72,29 +72,37 @@ st.markdown("""
 
     /* ----- WATER / PARTICLE EFFECTS ----- */
     @keyframes drop {
-        0% { top: -10px; opacity: 0; }
+        0% { top: -20px; opacity: 0; }
         30% { opacity: 1; }
         100% { top: 100vh; opacity: 0; }
     }
     .particle {
         position: fixed;
-        top: -10px;
+        top: -20px;
         border-radius: 50%;
         z-index: -1;
-        opacity: 0.7;
+        opacity: 0.8;
         background: #39FF14;
+    }
+
+    /* ----- FLOATING RADIOACTIVE ICONS ----- */
+    @keyframes floatY {
+        0% { transform: translateY(0px);}
+        50% { transform: translateY(-15px);}
+        100% { transform: translateY(0px);}
     }
     </style>
 """, unsafe_allow_html=True)
 
-# ----- Generate Particles -----
-for i in range(30):
+# ----- Generate falling water droplets -----
+for i in range(50):
     left = random.randint(0, 95)
     delay = random.uniform(0, 5)
-    duration = random.uniform(3, 6)
-    size = random.randint(3, 10)
+    duration = random.uniform(3, 7)
+    width = random.randint(2, 6)
+    height = random.randint(10, 20)
     st.markdown(f"""
-        <div class='particle' style='left:{left}%; width:{size}px; height:{size}px; animation: drop {duration}s linear {delay}s infinite;'></div>
+        <div class='particle' style='left:{left}%; width:{width}px; height:{height}px; animation: drop {duration}s linear {delay}s infinite;'></div>
     """, unsafe_allow_html=True)
 
 # ------------------- PREDICTION FUNCTION -------------------
@@ -194,24 +202,42 @@ with tabs[0]:
 
 # ---- TAB 2: Safety Meter ----
 with tabs[1]:
-    st.subheader("📊 Safe vs Unsafe Water Levels")
-    st.image("https://i.imgur.com/EVqH2YV.png", caption="WHO Safe Drinking Water Limits")
-    st.write("""
-    - ✅ pH: 6.5 – 8.5  
-    - ✅ TDS: < 500 mg/L  
-    - ✅ Hardness: < 200 mg/L  
-    - ✅ Nitrate: < 45 mg/L  
-    """)
+    st.subheader("📊 Safe vs Unsafe Water Levels (Futuristic View)")
+    safe_limits = {"pH": (6.5, 8.5), "TDS": (0, 500), "Hardness": (0, 200), "Nitrate": (0, 45)}
+    params = list(safe_limits.keys())
+    min_values = [0,0,0,0]
+    max_values = [14,2000,1000,500]
+    safe_max = [safe_limits[p][1] for p in params]
+
+    fig = go.Figure()
+    fig.add_trace(go.Bar(y=params, x=max_values, orientation='h',
+                         marker=dict(color='rgba(255,0,0,0.2)'), name="Unsafe Max"))
+    fig.add_trace(go.Bar(y=params, x=safe_max, orientation='h',
+                         marker=dict(color='rgba(57,255,20,0.7)'), name="Safe Range"))
+    fig.update_layout(barmode='overlay', paper_bgcolor='rgba(0,0,0,0)',
+                      plot_bgcolor='rgba(0,0,0,0)', font=dict(color='#39FF14', family='monospace'),
+                      title="Neon Safe vs Unsafe Levels", xaxis_title="Value", yaxis_title="Parameter")
+    st.plotly_chart(fig, use_container_width=True)
 
 # ---- TAB 3: Awareness ----
 with tabs[2]:
-    st.subheader("⚠️ Dangers of Radioactive Water")
-    st.image("https://i.imgur.com/whs7YdF.png", caption="Radioactive Waste Warning")
+    st.subheader("⚠️ Dangers of Radioactive Water (Interactive Dashboard)")
+    for i in range(10):
+        left = random.randint(0, 90)
+        delay = random.uniform(0, 3)
+        st.markdown(f"""
+        <div style='position: fixed; top: {random.randint(10, 80)}%; left:{left}%;
+                    font-size:30px; color:red; animation: floatY 4s ease-in-out {delay}s infinite; z-index:-1;'>
+            ☢️
+        </div>
+        """, unsafe_allow_html=True)
+
     st.write("""
     - ☢️ Radioactive water exposure can cause **cancer, organ damage, and genetic mutations**.  
     - ☠️ Animals and plants also suffer from **biological accumulation** of radioactive isotopes.  
     - 💧 Continuous monitoring is **critical** for human survival.  
     """)
 
+# ----- FOOTER -----
 st.markdown("---")
 st.markdown('<p style="text-align:center; color:#39FF14;">👨‍💻 Developed by Karthikeyan</p>', unsafe_allow_html=True)
