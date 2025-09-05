@@ -140,8 +140,6 @@ with tabs[1]:
     }
 
     params = list(safe_ranges.items())
-
-    # Display 2 parameters per row
     for i in range(0, len(params), 2):
         cols = st.columns(2)
         for j, col in enumerate(cols):
@@ -150,7 +148,7 @@ with tabs[1]:
             param, (low, high, value) = params[i + j]
             
             with col:
-                subcols = st.columns([1.1, 1.0, 0.7])  # Graph + value + status
+                subcols = st.columns([1.1, 1.0, 0.7])
 
                 # Small Bar Graph
                 with subcols[0]:
@@ -161,7 +159,6 @@ with tabs[1]:
                         name=f"{param} Value",
                         marker_color="red" if value < low or value > high else "#39FF14"
                     ))
-                    # Safe range overlay
                     fig.add_shape(
                         type="rect",
                         x0=-0.5, x1=0.5,
@@ -206,6 +203,7 @@ with tabs[2]:
     st.subheader("⚠️ Dangers of Radioactive Water")
     st.image("radioactive_process.png", caption="Radioactive Contamination Process", use_column_width=True)
 
+    # Professional uniform HTML block
     tab3_html = """
     <div style="background-color:#1a1a1a; padding:20px; border-radius:12px; color:#e8f5e9;">
         <h3 style="color:#FFD300;">☢️ Health Risks</h3>
@@ -238,6 +236,8 @@ with tabs[2]:
         </ul>
     </div>
     """
-
     st.markdown(tab3_html, unsafe_allow_html=True)
     st.info("ℹ️ Stay informed and take action to ensure safe drinking water.")
+
+st.markdown("---")
+st.markdown('<p style="text-align:center; color:#FFD300;">👨‍💻 Developed by Karthikeyan</p>', unsafe_allow_html=True)
