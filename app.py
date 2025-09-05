@@ -14,7 +14,7 @@ css_block = """
 html, body, [class*="css"] {
   font-family: 'Bebas Neue', cursive;
   background-color: #0a0a0a;
-  color: #e8f5e9;
+  color: #39FF14;
   min-height: 100vh;
 }
 
@@ -172,3 +172,4 @@ with tabs[2]:
 
 st.markdown("---")
 st.markdown('<p style="text-align:center; color:#39FF14;">👨‍💻 Developed by Karthikeyan</p>', unsafe_allow_html=True)
+
