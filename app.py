@@ -2,85 +2,42 @@ import streamlit as st
 import pandas as pd
 import plotly.graph_objects as go
 
-# ================= PAGE CONFIG =================
-st.set_page_config(page_title="Radioactive Water Contamination Detector", layout="wide")
+# ------------------- CUSTOM CSS -------------------
+st.markdown("""
+    <style>
+    body {
+        background-color: black;
+        color: #FFFF33;
+        font-family: monospace;
+    }
+    .stTabs [role="tablist"] button {
+        background: #111 !important;
+        color: #FFFF33 !important;
+        border-radius: 10px;
+        border: 1px solid #FFFF33;
+        margin-right: 5px;
+        transition: all 0.3s ease-in-out;
+        text-shadow: 0 0 10px #FFFF33, 0 0 20px #FFFF33;
+    }
+    .stTabs [role="tablist"] button:hover {
+        background: #FFFF33 !important;
+        color: black !important;
+        transform: scale(1.05);
+        text-shadow: 0 0 20px #FFFF33, 0 0 30px #FFFF33;
+    }
+    .glow-yellow {
+        color: #FFFF33 !important;
+        text-shadow: 0 0 10px #FFFF33, 0 0 20px #FFFF33, 0 0 40px #FFFF33;
+        font-size: 22px;
+    }
+    h1, h2, h3, .stMarkdown, .stText, .stCaption {
+        color: #FFFF33 !important;
+        text-shadow: 0 0 10px #FFFF33, 0 0 20px #FFFF33, 0 0 40px #FFFF33;
+    }
+    </style>
+""", unsafe_allow_html=True)
 
-# ================= CUSTOM CSS =================
-css_block = """
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap');
-
-/* General App Styling */
-html, body, [class*="css"] {
-  font-family: 'Bebas Neue', cursive;
-  background-color: #0a0a0a;
-  color: #e8f5e9;
-  min-height: 100vh;
-}
-
-/* Ensure content stays on top */
-.block-container, .main {
-  position: relative;
-  z-index: 2;
-}
-
-/* Title & Subtitle */
-h1.app-title {
-  text-align: center;
-  color: #39FF14;
-  font-size: 52px;
-  margin-bottom: 4px;
-  text-shadow: 0 0 10px #39FF14, 0 0 28px #FFD300;
-}
-p.app-sub {
-  text-align: center;
-  color: #FFD300;
-  margin-top: 0;
-  font-size: 20px;
-  text-shadow: 0 0 10px #FFD300;
-}
-
-/* Tabs */
-.stTabs [role="tablist"] button {
-    background: #101010 !important;
-    color: #39FF14 !important;
-    border-radius: 12px !important;
-    border: 1px solid rgba(57,255,20,0.3) !important;
-    margin-right: 6px !important;
-    padding: 8px 14px !important;
-    transition: all .18s ease;
-    font-size: 16px !important;
-}
-.stTabs [role="tablist"] button:hover {
-    background: #39FF14 !important;
-    color: black !important;
-    transform: translateY(-2px) scale(1.03);
-    box-shadow: 0 0 18px rgba(57,255,20,0.15);
-}
-.stTabs [role="tablist"] button[aria-selected="true"] {
-    background: linear-gradient(90deg, #FFD300, #FF7518) !important;
-    color: black !important;
-    border: 1px solid #FFD300 !important;
-    box-shadow: 0 0 26px rgba(255,211,0,0.35);
-}
-
-/* Results Glow */
-.glow-green {
-    color: #39FF14;
-    text-shadow: 0 0 20px #39FF14;
-    font-size: 22px;
-}
-.glow-red {
-    color: red;
-    text-shadow: 0 0 20px red;
-    font-size: 22px;
-}
-</style>
-"""
-
-st.markdown(css_block, unsafe_allow_html=True)
-
-# ================= FUNCTIONS =================
+# ------------------- PREDICTION FUNCTION -------------------
 def predict_contamination(ph, tds, hardness, nitrate):
     score = 0
     if ph < 6.5 or ph > 8.5: score += 30
@@ -89,11 +46,12 @@ def predict_contamination(ph, tds, hardness, nitrate):
     if nitrate > 45: score += 25
     return score
 
+# ------------------- GAUGE -------------------
 def show_risk_gauge(score):
     fig = go.Figure(go.Indicator(
         mode="gauge+number",
         value=score,
-        title={'text': "Radioactive Risk %"},
+        title={'text': "☢️ Radioactive Risk %", 'font': {'color': '#FFFF33'}},
         gauge={
             'axis': {'range': [0, 100]},
             'bar': {'color': "red" if score >= 60 else "orange" if score >= 30 else "green"},
@@ -104,15 +62,15 @@ def show_risk_gauge(score):
             ],
         }
     ))
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig)
 
-# ================= UI =================
-st.markdown("<h1 class='app-title'>💧☢️ Radioactive Water Contamination Detector</h1>", unsafe_allow_html=True)
-st.markdown("<p class='app-sub'>Futuristic AI/ML Powered System | Developed by Karthikeyan</p>", unsafe_allow_html=True)
+# ------------------- APP STRUCTURE -------------------
+st.title("💧☢️ Radioactive Water Contamination Detector")
+st.caption('<p class="glow-yellow">Futuristic AI/ML Powered System | Developed by Karthikeyan</p>', unsafe_allow_html=True)
 
 tabs = st.tabs(["🔬 Contamination Check", "📊 Safety Meter", "⚠️ Radioactive Awareness"])
 
-# ---- TAB 1 ----
+# ---- TAB 1: Check ----
 with tabs[0]:
     st.subheader("🔍 Enter Water Parameters")
 
@@ -126,16 +84,16 @@ with tabs[0]:
         score = predict_contamination(ph, tds, hardness, nitrate)
 
         if score < 30:
-            result = '<p class="glow-green">✅ Safe: No significant radioactive contamination detected.</p>'
+            result = '<p class="glow-yellow">✅ Safe: No significant radioactive contamination detected.</p>'
         elif score < 60:
-            result = '<p class="glow-red">⚠️ Moderate Risk: Some radioactive traces possible.</p>'
+            result = '<p class="glow-yellow">⚠️ Moderate Risk: Some radioactive traces possible.</p>'
         else:
-            result = '<p class="glow-red">☢️ High Risk: Potential radioactive contamination detected!</p>'
+            result = '<p class="glow-yellow">☢️ High Risk: Potential radioactive contamination detected!</p>'
 
         st.markdown(result, unsafe_allow_html=True)
         show_risk_gauge(score)
 
-        # Save dataset
+        # Save to dataset
         new_data = pd.DataFrame([[location, ph, tds, hardness, nitrate, score]],
                                 columns=["Location", "pH", "TDS", "Hardness", "Nitrate", "RiskScore"])
         try:
@@ -149,10 +107,10 @@ with tabs[0]:
         st.download_button("📥 Download Dataset", data=df.to_csv(index=False),
                            file_name="water_data.csv", mime="text/csv")
 
-# ---- TAB 2 ----
+# ---- TAB 2: Safety Meter ----
 with tabs[1]:
     st.subheader("📊 Safe vs Unsafe Water Levels")
-    st.image("https://images.unsplash.com/photo-1505761671935-60b3a7427bad", caption="WHO Safe Drinking Water Limits")
+    st.image("https://images.unsplash.com/photo-1528825871115-3581a5387919", caption="WHO Safe Drinking Water Limits")
     st.write("""
     - ✅ pH: 6.5 – 8.5  
     - ✅ TDS: < 500 mg/L  
@@ -160,10 +118,10 @@ with tabs[1]:
     - ✅ Nitrate: < 45 mg/L  
     """)
 
-# ---- TAB 3 ----
+# ---- TAB 3: Awareness ----
 with tabs[2]:
     st.subheader("⚠️ Dangers of Radioactive Water")
-    st.image("https://images.unsplash.com/photo-1605733160314-4d4d92c9c3f1", caption="Radioactive Waste Warning")
+    st.image("https://images.unsplash.com/photo-1600644356991-c3e3d1a73f4b", caption="Radioactive Waste Warning")
     st.write("""
     - ☢️ Radioactive water exposure can cause **cancer, organ damage, and genetic mutations**.  
     - ☠️ Animals and plants also suffer from **biological accumulation** of radioactive isotopes.  
@@ -171,4 +129,4 @@ with tabs[2]:
     """)
 
 st.markdown("---")
-st.markdown('<p style="text-align:center; color:#39FF14;">👨‍💻 Developed by Karthikeyan</p>', unsafe_allow_html=True)
+st.markdown('<p style="text-align:center;" class="glow-yellow">👨‍💻 Developed by Karthikeyan</p>', unsafe_allow_html=True)
