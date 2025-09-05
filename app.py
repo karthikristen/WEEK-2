@@ -191,7 +191,7 @@ with tabs[1]:
 # ---- TAB 3 ----
 with tabs[2]:
     st.subheader("⚠️ Dangers of Radioactive Water")
-    st.image("radioactive_process.png", caption="Radioactive Contamination Process", use_column_width=True)
+    st.image("radioactive_process.png", caption="Radioactive Contamination Process", use_container_width=True)
 
     sections = [
         {
@@ -245,3 +245,4 @@ with tabs[2]:
 # Footer
 st.markdown("---")
 st.markdown('<p style="text-align:center; color:#FFD300;">👨‍💻 Developed by Karthikeyan</p>', unsafe_allow_html=True)
+
