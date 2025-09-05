@@ -27,17 +27,17 @@ html, body, [class*="css"] {
 /* Title & Subtitle */
 h1.app-title {
   text-align: center;
-  color: #FFD300; /* Yellow radioactive title */
+  color: #39FF14;
   font-size: 52px;
   margin-bottom: 4px;
-  text-shadow: 0 0 10px #FFD300, 0 0 28px #FF7518;
+  text-shadow: 0 0 10px #39FF14, 0 0 28px #FFD300;
 }
 p.app-sub {
   text-align: center;
-  color: #39FF14;
+  color: #FFD300;
   margin-top: 0;
   font-size: 20px;
-  text-shadow: 0 0 10px #39FF14;
+  text-shadow: 0 0 10px #FFD300;
 }
 
 /* Tabs */
@@ -152,8 +152,7 @@ with tabs[0]:
 # ---- TAB 2 ----
 with tabs[1]:
     st.subheader("📊 Safe vs Unsafe Water Levels")
-    # Replace "safety.png" with your own image
-    st.image("safety.png", caption="WHO Safe Drinking Water Limits")
+    st.image("https://images.unsplash.com/photo-1505761671935-60b3a7427bad", caption="WHO Safe Drinking Water Limits")
     st.write("""
     - ✅ pH: 6.5 – 8.5  
     - ✅ TDS: < 500 mg/L  
@@ -164,8 +163,7 @@ with tabs[1]:
 # ---- TAB 3 ----
 with tabs[2]:
     st.subheader("⚠️ Dangers of Radioactive Water")
-    # Replace "danger.png" with your own image
-    st.image("danger.png", caption="Radioactive Waste Warning")
+    st.image("https://images.unsplash.com/photo-1605733160314-4d4d92c9c3f1", caption="Radioactive Waste Warning")
     st.write("""
     - ☢️ Radioactive water exposure can cause **cancer, organ damage, and genetic mutations**.  
     - ☠️ Animals and plants also suffer from **biological accumulation** of radioactive isotopes.  
@@ -173,4 +171,4 @@ with tabs[2]:
     """)
 
 st.markdown("---")
-st.markdown('<p style="text-align:center; color:#FFD300;">👨‍💻 Developed by Karthikeyan</p>', unsafe_allow_html=True)
+st.markdown('<p style="text-align:center; color:#39FF14;">👨‍💻 Developed by Karthikeyan</p>', unsafe_allow_html=True)
