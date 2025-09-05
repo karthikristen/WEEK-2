@@ -10,86 +10,74 @@ css_block = """
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap');
 
-/* General Styling */
+/* General App Styling */
 html, body, [class*="css"] {
-  font-family: 'Bebas Neue', sans-serif;
+  font-family: 'Bebas Neue', cursive;
   background-color: #0a0a0a;
-  color: #FFD300;
+  color: #e8f5e9;
   min-height: 100vh;
 }
 
-/* Title */
-h1.app-title {
-  text-align: center;
-  color: #FFD300;
-  font-size: 54px;
-  margin-bottom: 2px;
-  text-shadow: 0 0 12px #FFD300, 0 0 28px #FF7518;
+/* Ensure content stays on top */
+.block-container, .main {
+  position: relative;
+  z-index: 2;
 }
 
-/* Subtitle */
+/* Title & Subtitle */
+h1.app-title {
+  text-align: center;
+  color: #FFD300; /* Yellow radioactive title */
+  font-size: 52px;
+  margin-bottom: 4px;
+  text-shadow: 0 0 10px #FFD300, 0 0 28px #FF7518;
+}
 p.app-sub {
   text-align: center;
   color: #39FF14;
   margin-top: 0;
-  font-size: 22px;
-  text-shadow: 0 0 12px #39FF14, 0 0 22px #39FF14;
+  font-size: 20px;
+  text-shadow: 0 0 10px #39FF14;
 }
 
 /* Tabs */
 .stTabs [role="tablist"] button {
     background: #101010 !important;
-    color: #FFD300 !important;
+    color: #39FF14 !important;
     border-radius: 12px !important;
-    border: 1px solid rgba(255,211,0,0.4) !important;
+    border: 1px solid rgba(57,255,20,0.3) !important;
     margin-right: 6px !important;
     padding: 8px 14px !important;
-    transition: all .2s ease;
-    font-size: 18px !important;
-    text-shadow: 0 0 10px #FFD300;
+    transition: all .18s ease;
+    font-size: 16px !important;
 }
 .stTabs [role="tablist"] button:hover {
-    background: #FFD300 !important;
+    background: #39FF14 !important;
     color: black !important;
     transform: translateY(-2px) scale(1.03);
-    box-shadow: 0 0 20px rgba(255,211,0,0.3);
+    box-shadow: 0 0 18px rgba(57,255,20,0.15);
 }
 .stTabs [role="tablist"] button[aria-selected="true"] {
     background: linear-gradient(90deg, #FFD300, #FF7518) !important;
     color: black !important;
     border: 1px solid #FFD300 !important;
-    box-shadow: 0 0 24px rgba(255,211,0,0.4);
+    box-shadow: 0 0 26px rgba(255,211,0,0.35);
 }
 
 /* Results Glow */
 .glow-green {
     color: #39FF14;
     text-shadow: 0 0 20px #39FF14;
-    font-size: 24px;
+    font-size: 22px;
 }
 .glow-red {
     color: red;
     text-shadow: 0 0 20px red;
-    font-size: 24px;
-}
-
-/* Images */
-.stImage img {
-    border-radius: 12px;
-    box-shadow: 0 0 20px rgba(255,211,0,0.2);
-    margin-bottom: 16px;
-}
-
-/* Footer */
-.footer {
-    text-align: center;
-    color: #FFD300;
-    margin-top: 30px;
-    font-size: 18px;
-    text-shadow: 0 0 10px #FFD300, 0 0 20px #FF7518;
+    font-size: 22px;
 }
 </style>
 """
+
 st.markdown(css_block, unsafe_allow_html=True)
 
 # ================= FUNCTIONS =================
@@ -105,7 +93,7 @@ def show_risk_gauge(score):
     fig = go.Figure(go.Indicator(
         mode="gauge+number",
         value=score,
-        title={'text': "☢️ Risk Level (%)", 'font': {'color': '#FFD300', 'size': 20}},
+        title={'text': "Radioactive Risk %"},
         gauge={
             'axis': {'range': [0, 100]},
             'bar': {'color': "red" if score >= 60 else "orange" if score >= 30 else "green"},
@@ -164,7 +152,7 @@ with tabs[0]:
 # ---- TAB 2 ----
 with tabs[1]:
     st.subheader("📊 Safe vs Unsafe Water Levels")
-    st.image("safety.png", caption="WHO Safe Drinking Water Limits")  # replace with your own
+    st.image("radioactive_process.png", caption="Process of Radioactive Materials in Groundwater")
     st.write("""
     - ✅ pH: 6.5 – 8.5  
     - ✅ TDS: < 500 mg/L  
@@ -175,12 +163,12 @@ with tabs[1]:
 # ---- TAB 3 ----
 with tabs[2]:
     st.subheader("⚠️ Dangers of Radioactive Water")
-    st.image("danger.png", caption="Radioactive Waste Warning")  # replace with your own
+    st.image("radioactive_process.png", caption="Radioactive Waste Warning")
     st.write("""
     - ☢️ Radioactive water exposure can cause **cancer, organ damage, and genetic mutations**.  
     - ☠️ Animals and plants also suffer from **biological accumulation** of radioactive isotopes.  
     - 💧 Continuous monitoring is **critical** for human survival.  
     """)
 
-# ---- FOOTER ----
-st.markdown('<p class="footer">👨‍💻 Developed by Karthikeyan</p>', unsafe_allow_html=True)
+st.markdown("---")
+st.markdown('<p style="text-align:center; color:#FFD300;">👨‍💻 Developed by Karthikeyan</p>', unsafe_allow_html=True)
