@@ -2,136 +2,195 @@ import streamlit as st
 import pandas as pd
 import plotly.graph_objects as go
 
-# ===================== APP CONFIG =====================
-st.set_page_config(
-    page_title="💧 Radioactive Water Detection",
-    page_icon="☢️",
-    layout="wide",
-    initial_sidebar_state="expanded"
-)
+# ================= PAGE CONFIG =================
+st.set_page_config(page_title="Radioactive Water Contamination Detector", layout="wide")
 
-# Neon green theme styling
-st.markdown("""
-    <style>
-    body {
-        background-color: black;
-        color: #39ff14; /* Neon green */
+# ================= CUSTOM CSS =================
+css_block = """
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap');
+
+* {
+  font-family: 'Bebas Neue', sans-serif !important;
+}
+
+html, body, [class*="css"] {
+  background-color: #0a0a0a;
+  color: #e8f5e9;
+  min-height: 100vh;
+}
+
+/* Title & Subtitle */
+h1.app-title {
+  text-align: center;
+  color: #FFD300; /* Yellow radioactive title */
+  font-size: 52px;
+  margin-bottom: 4px;
+  text-shadow: 0 0 10px #FFD300, 0 0 28px #FF7518;
+}
+p.app-sub {
+  text-align: center;
+  color: #39FF14;
+  margin-top: 0;
+  font-size: 20px;
+  text-shadow: 0 0 10px #39FF14;
+}
+
+/* Tabs */
+.stTabs [role="tablist"] button {
+    background: #101010 !important;
+    color: #39FF14 !important;
+    border-radius: 12px !important;
+    border: 1px solid rgba(57,255,20,0.3) !important;
+    margin-right: 6px !important;
+    padding: 8px 14px !important;
+    transition: all .18s ease;
+    font-size: 16px !important;
+}
+.stTabs [role="tablist"] button:hover {
+    background: #39FF14 !important;
+    color: black !important;
+    transform: translateY(-2px) scale(1.03);
+    box-shadow: 0 0 18px rgba(57,255,20,0.15);
+}
+.stTabs [role="tablist"] button[aria-selected="true"] {
+    background: linear-gradient(90deg, #FFD300, #FF7518) !important;
+    color: black !important;
+    border: 1px solid #FFD300 !important;
+    box-shadow: 0 0 26px rgba(255,211,0,0.35);
+}
+
+/* Results Glow */
+.glow-green {
+    color: #39FF14;
+    text-shadow: 0 0 20px #39FF14;
+    font-size: 22px;
+}
+.glow-red {
+    color: red;
+    text-shadow: 0 0 20px red;
+    font-size: 22px;
+}
+</style>
+"""
+
+st.markdown(css_block, unsafe_allow_html=True)
+
+# ================= FUNCTIONS =================
+def predict_contamination(ph, tds, hardness, nitrate):
+    score = 0
+    if ph < 6.5 or ph > 8.5: score += 30
+    if tds > 500: score += 25
+    if hardness > 200: score += 20
+    if nitrate > 45: score += 25
+    return score
+
+def show_risk_gauge(score):
+    fig = go.Figure(go.Indicator(
+        mode="gauge+number",
+        value=score,
+        title={'text': "Radioactive Risk %"},
+        gauge={
+            'axis': {'range': [0, 100]},
+            'bar': {'color': "red" if score >= 60 else "orange" if score >= 30 else "green"},
+            'steps': [
+                {'range': [0, 30], 'color': "lightgreen"},
+                {'range': [30, 60], 'color': "yellow"},
+                {'range': [60, 100], 'color': "red"}
+            ],
+        }
+    ))
+    st.plotly_chart(fig, use_container_width=True)
+
+def show_safety_graph(ph, tds, hardness, nitrate):
+    safe_ranges = {
+        "pH": (6.5, 8.5),
+        "TDS": (0, 500),
+        "Hardness": (0, 200),
+        "Nitrate": (0, 45),
     }
-    .stApp {
-        background: radial-gradient(circle at top, #001100, #000000);
-        color: #39ff14;
-    }
-    .stTabs [data-baseweb="tab-list"] button {
-        color: #39ff14;
-        font-weight: bold;
-    }
-    </style>
-""", unsafe_allow_html=True)
+    values = {"pH": ph, "TDS": tds, "Hardness": hardness, "Nitrate": nitrate}
 
-# ===================== SIDEBAR =====================
-st.sidebar.image("https://cdn-icons-png.flaticon.com/512/483/483947.png", width=80)
-st.sidebar.title("☢️ Water Safety Monitor")
-st.sidebar.write("Developed by **Karthikeyan**")
+    fig = go.Figure()
+    for param, (low, high) in safe_ranges.items():
+        fig.add_trace(go.Bar(
+            x=[param],
+            y=[values[param]],
+            name=f"{param} Value",
+            marker_color="red" if values[param] < low or values[param] > high else "green"
+        ))
+        fig.add_trace(go.Bar(
+            x=[param],
+            y=[high],
+            name=f"{param} Safe Max",
+            marker_color="lightgreen",
+            opacity=0.5
+        ))
 
-# ===================== TABS =====================
-tabs = st.tabs(["🏠 Home", "📊 Input Data", "📈 Comparison", "⚠️ Radioactive Caution"])
+    fig.update_layout(
+        title="Water Quality vs Safe Ranges",
+        barmode="overlay",
+        yaxis_title="Levels (mg/L or pH)"
+    )
+    st.plotly_chart(fig, use_container_width=True)
 
-# ===================== HOME TAB =====================
+# ================= UI =================
+st.markdown("<h1 class='app-title'>💧☢️ Radioactive Water Contamination Detector</h1>", unsafe_allow_html=True)
+st.markdown("<p class='app-sub'>Futuristic AI/ML Powered System | Developed by Karthikeyan</p>", unsafe_allow_html=True)
+
+tabs = st.tabs(["🔬 Contamination Check", "📊 Safety Meter", "⚠️ Radioactive Awareness"])
+
+# ---- TAB 1 ----
 with tabs[0]:
-    st.title("💧 AI/ML App for Radioactive Water Contamination Detection")
-    st.markdown("""
-        This application helps in **detecting possible radioactive contamination** 
-        in groundwater using water quality parameters.
-        
-        ⚡ Powered by AI/ML | 🎨 Neon Reactive Theme
-    """)
-    st.image("https://media.giphy.com/media/3o7abldj0b3rxrZUxW/giphy.gif", caption="Water Safety in Action", use_container_width=True)
+    st.subheader("🔍 Enter Water Parameters")
 
-# ===================== INPUT TAB =====================
-with tabs[1]:
-    st.header("📊 Enter Water Quality Parameters")
-
-    pH = st.number_input("pH Level", 0.0, 14.0, 7.0)
+    ph = st.number_input("pH Level", 0.0, 14.0, 7.0)
     tds = st.number_input("TDS (mg/L)", 0.0, 2000.0, 300.0)
     hardness = st.number_input("Hardness (mg/L)", 0.0, 1000.0, 150.0)
-    nitrate = st.number_input("Nitrate (mg/L)", 0.0, 100.0, 20.0)
-    location = st.text_input("📍 Location Name", "Chengalpet")
+    nitrate = st.number_input("Nitrate (mg/L)", 0.0, 500.0, 20.0)
+    location = st.text_input("📍 Location")
 
-    # Threshold logic
-    safe = True
-    if not (6.5 <= pH <= 8.5):
-        safe = False
-    if tds > 500 or hardness > 200 or nitrate > 45:
-        safe = False
+    if st.button("Run Analysis"):
+        score = predict_contamination(ph, tds, hardness, nitrate)
 
-    if safe:
-        st.success("✅ Safe: No significant radioactive contamination detected.")
-    else:
-        st.error("☢️ Not Safe: Possible radioactive contamination detected!")
+        if score < 30:
+            result = '<p class="glow-green">✅ Safe: No significant radioactive contamination detected.</p>'
+        elif score < 60:
+            result = '<p class="glow-red">⚠️ Moderate Risk: Some radioactive traces possible.</p>'
+        else:
+            result = '<p class="glow-red">☢️ High Risk: Potential radioactive contamination detected!</p>'
 
-    # Save data
-    if st.button("💾 Save Data"):
-        data = pd.DataFrame([[location, pH, tds, hardness, nitrate, "Safe" if safe else "Not Safe"]],
-                            columns=["Location", "pH", "TDS", "Hardness", "Nitrate", "Status"])
+        st.markdown(result, unsafe_allow_html=True)
+        show_risk_gauge(score)
+
+        # Save dataset
+        new_data = pd.DataFrame([[location, ph, tds, hardness, nitrate, score]],
+                                columns=["Location", "pH", "TDS", "Hardness", "Nitrate", "RiskScore"])
         try:
             old_data = pd.read_csv("water_data.csv")
-            data = pd.concat([old_data, data], ignore_index=True)
+            df = pd.concat([old_data, new_data], ignore_index=True)
         except:
-            pass
-        data.to_csv("water_data.csv", index=False)
-        st.success("📂 Data saved successfully!")
+            df = new_data
+        df.to_csv("water_data.csv", index=False)
 
-    # Download data
-    try:
-        data_file = pd.read_csv("water_data.csv")
-        st.download_button("⬇️ Download Data", data_file.to_csv(index=False), "water_data.csv")
-    except:
-        pass
+        st.success("Data saved successfully ✅")
+        st.download_button("📥 Download Dataset", data=df.to_csv(index=False),
+                           file_name="water_data.csv", mime="text/csv")
 
-# ===================== COMPARISON TAB =====================
+# ---- TAB 2 ----
+with tabs[1]:
+    st.subheader("📊 Safe vs Unsafe Water Levels")
+    show_safety_graph(ph, tds, hardness, nitrate)
+
+# ---- TAB 3 ----
 with tabs[2]:
-    st.header("📈 Safe Values vs Your Values")
-
-    safe_values = {"pH": 7.0, "TDS": 500, "Hardness": 200, "Nitrate": 45}
-    user_values = {"pH": pH, "TDS": tds, "Hardness": hardness, "Nitrate": nitrate}
-
-    # Safe Graph
-    fig_safe = go.Figure(go.Bar(
-        x=list(safe_values.keys()),
-        y=list(safe_values.values()),
-        marker_color="green",
-        name="Safe Limits"
-    ))
-    fig_safe.update_layout(height=250, width=250, title="Safe Values", title_x=0.5)
-
-    # User Graph
-    fig_user = go.Figure(go.Bar(
-        x=list(user_values.keys()),
-        y=list(user_values.values()),
-        marker_color="red",
-        name="Your Input"
-    ))
-    fig_user.update_layout(height=250, width=250, title="Your Values", title_x=0.5)
-
-    # Place graphs side by side
-    col1, col2 = st.columns(2)
-    with col1:
-        st.plotly_chart(fig_safe, use_container_width=True)
-    with col2:
-        st.plotly_chart(fig_user, use_container_width=True)
-
-# ===================== CAUTION TAB =====================
-with tabs[3]:
-    st.header("⚠️ Caution: Radioactive Contamination in Water")
-    st.markdown("""
-        Radioactive contamination in water can cause **severe health issues**:
-
-        - ☢️ **Cancer risks** due to long-term exposure  
-        - 🧬 **DNA damage and genetic mutations**  
-        - 🫁 **Organ damage** (kidney, liver, lungs)  
-        - 🐟 **Harmful to aquatic life**  
-        - 🐄 **Contaminates livestock & agriculture**  
-
-        Ensuring **clean, safe water** is vital for humans, animals, and the environment.  
+    st.subheader("⚠️ Dangers of Radioactive Water")
+    st.image("radioactive_process", caption="Radioactive Contamination Process")  # <-- Your saved anime-style image
+    st.write("""
+    - ☢️ Radioactive water exposure can cause **cancer, organ damage, and genetic mutations**.  
+    - ☠️ Animals and plants also suffer from **biological accumulation** of radioactive isotopes.  
+    - 💧 Continuous monitoring is **critical** for human survival.  
     """)
-    st.image("radioactive_process.png", width=200)
+
+st.markdown("---")
+st.markdown('<p style="text-align:center; color:#FFD300;">👨‍💻 Developed by Karthikeyan</p>', unsafe_allow_html=True)
