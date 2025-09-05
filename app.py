@@ -6,13 +6,14 @@ import random
 # ------------------- CUSTOM CSS -------------------
 st.markdown("""
 <style>
+/* ----- IMPORT BEBAS NEUE ----- */
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap');
+
 /* ----- BODY & OLIVE GREEN GRADIENT ----- */
-body {
+[data-testid="stAppViewContainer"] {
     background: linear-gradient(-45deg, #556B2F, #6B8E23, #808000, #556B2F);
     background-size: 400% 400%;
     animation: gradientBG 20s ease infinite;
-    color: #39FF14;
-    font-family: monospace;
 }
 @keyframes gradientBG {
     0% { background-position: 0% 50%; }
@@ -28,6 +29,7 @@ body {
     border: 1px solid #39FF14;
     margin-right: 5px;
     transition: all 0.3s ease-in-out;
+    font-family: 'Bebas Neue', cursive;
 }
 .stTabs [role="tablist"] button:hover,
 .stTabs [role="tablist"] button:focus {
@@ -37,22 +39,24 @@ body {
     transform: scale(1.1);
 }
 
-/* ----- GLOWING HEADINGS ----- */
-h1, h2, h3, h4 {
-    animation: glowText 2s ease-in-out infinite alternate;
+/* ----- GLOWING HEADINGS & CENTERED ----- */
+h1, h2, h3, h4, h5, h6, p {
+    font-family: 'Bebas Neue', cursive;
+    text-align: center;
 }
-@keyframes glowText {
-    0% { text-shadow: 0 0 5px #39FF14; }
-    100% { text-shadow: 0 0 20px #39FF14, 0 0 30px #39FF14; }
+.centered-glow {
+    color: #39FF14;
+    text-shadow: 0 0 10px #39FF14, 0 0 20px #39FF14;
 }
 
-/* ----- GLOWING INPUTS ----- */
-input, .stNumberInput, .stTextInput input {
-    background: #3B5323 !important;
-    color: #39FF14 !important;
-    border: 1px solid #39FF14 !important;
-    border-radius: 5px;
-    box-shadow: 0 0 10px #39FF14;
+/* ----- CENTER INPUTS AND BUTTONS ----- */
+.stNumberInput, .stTextInput, .stButton button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-left: auto;
+    margin-right: auto;
+    font-family: 'Bebas Neue', cursive;
 }
 
 /* ----- GLOWING BUTTONS ----- */
@@ -74,15 +78,16 @@ button:hover {
 @keyframes drop {
     0% { top: -20px; opacity: 0; }
     30% { opacity: 1; }
-    100% { top: 2000px; opacity: 0; }
+    100% { top: 100vh; opacity: 0; }
 }
 .droplet {
-    position: absolute;  /* scrolls with content */
+    position: fixed;  /* moves with viewport, no extra space */
     width: 4px;
     height: 15px;
     background: #39FF14;
     border-radius: 50%;
-    animation: drop 5s linear infinite;
+    animation: drop linear infinite;
+    z-index: -1;      /* behind all content */
 }
 
 /* ----- FLOATING RADIOACTIVE ICONS ----- */
@@ -94,10 +99,7 @@ button:hover {
 </style>
 """, unsafe_allow_html=True)
 
-# Container div for scrollable droplets
-st.markdown('<div class="container" style="position:relative; width:100%; height:2000px;">', unsafe_allow_html=True)
-
-# Generate multiple scrollable droplets
+# ------------------- DROPLETS -------------------
 for i in range(50):
     left = random.randint(0, 95)
     delay = random.uniform(0, 5)
@@ -109,12 +111,10 @@ for i in range(50):
         left:{left}%;
         width:{width}px;
         height:{height}px;
-        animation-delay:{delay}s;
         animation-duration:{duration}s;
+        animation-delay:{delay}s;
     "></div>
     """, unsafe_allow_html=True)
-
-st.markdown('</div>', unsafe_allow_html=True)
 
 # ------------------- PREDICTION FUNCTION -------------------
 def predict_contamination(ph, tds, hardness, nitrate):
@@ -144,28 +144,28 @@ def show_risk_gauge(score):
         }
     ))
     fig.update_layout(paper_bgcolor='rgba(0,0,0,0)',
-                      font={'color': "#39FF14", 'family': "monospace"},
+                      font={'color': "#39FF14", 'family': "Bebas Neue"},
                       transition={'duration': 1000, 'easing': 'cubic-in-out'})
     st.plotly_chart(fig, use_container_width=True)
 
 # ------------------- RISK MESSAGE -------------------
 def show_risk_message(score):
     if score < 30:
-        st.markdown('<p style="color:#39FF14; font-size:22px; text-shadow:0 0 10px #39FF14;">✅ Safe: No significant radioactive contamination detected.</p>', unsafe_allow_html=True)
+        st.markdown('<p class="centered-glow">✅ Safe: No significant radioactive contamination detected.</p>', unsafe_allow_html=True)
     elif score < 60:
-        st.markdown('<p style="color:#FFFF00; font-size:22px; text-shadow:0 0 10px #FFFF00; animation: glowText 1.5s ease-in-out infinite alternate;">⚠️ Moderate Risk: Some radioactive traces possible.</p>', unsafe_allow_html=True)
+        st.markdown('<p class="centered-glow" style="color:#FFFF00;">⚠️ Moderate Risk: Some radioactive traces possible.</p>', unsafe_allow_html=True)
     else:
-        st.markdown('<p style="color:red; font-size:22px; text-shadow:0 0 20px red, 0 0 30px red; animation: glowText 1.2s ease-in-out infinite alternate;">☢️ High Risk: Potential radioactive contamination detected!</p>', unsafe_allow_html=True)
+        st.markdown('<p class="centered-glow" style="color:red;">☢️ High Risk: Potential radioactive contamination detected!</p>', unsafe_allow_html=True)
 
 # ------------------- APP STRUCTURE -------------------
-st.title("💧☢️ Radioactive Water Contamination Detector")
-st.caption("Futuristic AI/ML Powered System | Developed by **Karthikeyan**")
+st.markdown('<h1 class="centered-glow">💧☢️ Radioactive Water Contamination Detector</h1>', unsafe_allow_html=True)
+st.markdown('<h3 class="centered-glow">Futuristic AI/ML Powered System | Developed by Karthikeyan</h3>', unsafe_allow_html=True)
 
 tabs = st.tabs(["🔬 Contamination Check", "📊 Safety Meter", "⚠️ Radioactive Awareness"])
 
 # ---- TAB 1: Contamination Check ----
 with tabs[0]:
-    st.subheader("🔍 Enter Water Parameters")
+    st.subheader("🔍 Enter Water Parameters", anchor=None)
     ph = st.number_input("pH Level", 0.0, 14.0, 7.0)
     tds = st.number_input("TDS (mg/L)", 0.0, 2000.0, 300.0)
     hardness = st.number_input("Hardness (mg/L)", 0.0, 1000.0, 150.0)
@@ -174,21 +174,8 @@ with tabs[0]:
 
     if st.button("Run Analysis"):
         score = predict_contamination(ph, tds, hardness, nitrate)
-
-        # Neon panel container
-        st.markdown("""
-        <div style="
-            border: 2px solid #39FF14;
-            border-radius: 15px;
-            padding: 20px;
-            box-shadow: 0 0 20px #39FF14, 0 0 40px #39FF14 inset;
-            background-color: rgba(0,0,0,0.6);
-        ">
-        """, unsafe_allow_html=True)
-
         show_risk_gauge(score)
         show_risk_message(score)
-        st.markdown("</div>", unsafe_allow_html=True)
 
         # Save to dataset
         new_data = pd.DataFrame([[location, ph, tds, hardness, nitrate, score]],
@@ -206,7 +193,7 @@ with tabs[0]:
 
 # ---- TAB 2: Safety Meter ----
 with tabs[1]:
-    st.subheader("📊 Safe vs Unsafe Water Levels (Futuristic View)")
+    st.subheader("📊 Safe vs Unsafe Water Levels")
     safe_limits = {"pH": (6.5, 8.5), "TDS": (0, 500), "Hardness": (0, 200), "Nitrate": (0, 45)}
     params = list(safe_limits.keys())
     max_values = [14,2000,1000,500]
@@ -218,13 +205,13 @@ with tabs[1]:
     fig.add_trace(go.Bar(y=params, x=safe_max, orientation='h',
                          marker=dict(color='rgba(57,255,20,0.7)'), name="Safe Range"))
     fig.update_layout(barmode='overlay', paper_bgcolor='rgba(0,0,0,0)',
-                      plot_bgcolor='rgba(0,0,0,0)', font=dict(color='#39FF14', family='monospace'),
+                      plot_bgcolor='rgba(0,0,0,0)', font=dict(color='#39FF14', family='Bebas Neue'),
                       title="Neon Safe vs Unsafe Levels", xaxis_title="Value", yaxis_title="Parameter")
     st.plotly_chart(fig, use_container_width=True)
 
 # ---- TAB 3: Awareness ----
 with tabs[2]:
-    st.subheader("⚠️ Dangers of Radioactive Water (Interactive Dashboard)")
+    st.subheader("⚠️ Dangers of Radioactive Water")
     for i in range(10):
         left = random.randint(0, 90)
         delay = random.uniform(0, 3)
@@ -243,4 +230,4 @@ with tabs[2]:
 
 # ----- FOOTER -----
 st.markdown("---")
-st.markdown('<p style="text-align:center; color:#39FF14;">👨‍💻 Developed by Karthikeyan</p>', unsafe_allow_html=True)
+st.markdown('<p class="centered-glow">👨‍💻 Developed by Karthikeyan</p>', unsafe_allow_html=True)
