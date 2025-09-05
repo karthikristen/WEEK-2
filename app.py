@@ -92,6 +92,7 @@ with tabs[0]:
     if st.button("Run Analysis"):
         score = predict_contamination(ph, tds, hardness, nitrate)
 
+        # Result message
         if score < 30:
             result = '✅ Safe: No significant radioactive contamination detected.'
         elif score < 60:
@@ -100,6 +101,23 @@ with tabs[0]:
             result = '☢️ High Risk: Potential radioactive contamination detected!'
 
         st.markdown(f"<p style='font-size:20px; color:#FFD300;'>{result}</p>", unsafe_allow_html=True)
+
+        # ----- Gauge Meter -----
+        fig = go.Figure(go.Indicator(
+            mode="gauge+number",
+            value=score,
+            title={'text': "Radioactive Risk %"},
+            gauge={
+                'axis': {'range': [0, 100]},
+                'bar': {'color': "red" if score >= 60 else "orange" if score >= 30 else "#39FF14"},
+                'steps': [
+                    {'range': [0, 30], 'color': "#39FF14"},
+                    {'range': [30, 60], 'color': "yellow"},
+                    {'range': [60, 100], 'color': "red"}
+                ],
+            }
+        ))
+        st.plotly_chart(fig, use_container_width=True)
 
         # Save dataset
         new_data = pd.DataFrame([[location, ph, tds, hardness, nitrate, score]],
@@ -245,4 +263,5 @@ with tabs[2]:
 # Footer
 st.markdown("---")
 st.markdown('<p style="text-align:center; color:#FFD300;">👨‍💻 Developed by Karthikeyan</p>', unsafe_allow_html=True)
+
 
