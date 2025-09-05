@@ -74,6 +74,7 @@ p.app-sub {
 }
 </style>
 """
+
 st.markdown(css_block, unsafe_allow_html=True)
 
 # ================= FUNCTIONS =================
@@ -129,7 +130,7 @@ with tabs[0]:
 
 # ---- TAB 2 ----
 with tabs[1]:
-    st.subheader("📊 Safe vs Unsafe Water Levels")
+    st.subheader("📊 Safe vs Unsafe Water Levels (Mini Dashboard)")
 
     safe_ranges = {
         "pH": (6.5, 8.5, ph),
@@ -138,55 +139,65 @@ with tabs[1]:
         "Nitrate (mg/L)": (0, 45, nitrate)
     }
 
-    for param, (low, high, value) in safe_ranges.items():
-        col1, col2, col3 = st.columns([1.1, 1.0, 0.7])  # Graph + value + risk
+    params = list(safe_ranges.items())
 
-        # ---- Small Bar Graph ----
-        with col1:
-            fig = go.Figure()
-            fig.add_trace(go.Bar(
-                x=[param],
-                y=[value],
-                name=f"{param} Value",
-                marker_color="red" if value < low or value > high else "#39FF14"
-            ))
-            # Safe range overlay
-            fig.add_shape(
-                type="rect",
-                x0=-0.5, x1=0.5,
-                y0=low, y1=high,
-                fillcolor="rgba(57,255,20,0.2)",
-                line_width=0
-            )
-            fig.update_layout(
-                title=f"{param} Level",
-                barmode="overlay",
-                height=200, width=200,
-                margin=dict(l=15, r=15, t=35, b=15)
-            )
-            st.plotly_chart(fig, use_container_width=False)
+    # Display 2 parameters per row
+    for i in range(0, len(params), 2):
+        cols = st.columns(2)
+        for j, col in enumerate(cols):
+            if i + j >= len(params):
+                break
+            param, (low, high, value) = params[i + j]
+            
+            with col:
+                subcols = st.columns([1.1, 1.0, 0.7])  # Graph + value + status
 
-        # ---- Display Value ----
-        with col2:
-            st.markdown(
-                f"""
-                <div style="font-size:16px; color:#FFD300;">
-                <b>{param}</b><br>
-                Safe Range: {low} – {high}<br>
-                Your Value: <span style="color:{'red' if value < low or value > high else '#39FF14'};">{value}</span>
-                </div>
-                """,
-                unsafe_allow_html=True
-            )
+                # Small Bar Graph
+                with subcols[0]:
+                    fig = go.Figure()
+                    fig.add_trace(go.Bar(
+                        x=[param],
+                        y=[value],
+                        name=f"{param} Value",
+                        marker_color="red" if value < low or value > high else "#39FF14"
+                    ))
+                    # Safe range overlay
+                    fig.add_shape(
+                        type="rect",
+                        x0=-0.5, x1=0.5,
+                        y0=low, y1=high,
+                        fillcolor="rgba(57,255,20,0.2)",
+                        line_width=0
+                    )
+                    fig.update_layout(
+                        title=f"{param} Level",
+                        barmode="overlay",
+                        height=180, width=180,
+                        margin=dict(l=10, r=10, t=30, b=10)
+                    )
+                    st.plotly_chart(fig, use_container_width=False)
 
-        # ---- Parameter Risk ----
-        with col3:
-            status = "✅ Safe" if low <= value <= high else "⚠️ Unsafe"
-            color = "#39FF14" if low <= value <= high else "red"
-            st.markdown(
-                f"<div style='font-size:18px; color:{color};'><b>{status}</b></div>",
-                unsafe_allow_html=True
-            )
+                # Display Value
+                with subcols[1]:
+                    st.markdown(
+                        f"""
+                        <div style="font-size:16px; color:#FFD300;">
+                        <b>{param}</b><br>
+                        Safe Range: {low} – {high}<br>
+                        Your Value: <span style="color:{'red' if value < low or value > high else '#39FF14'};">{value}</span>
+                        </div>
+                        """,
+                        unsafe_allow_html=True
+                    )
+
+                # Parameter Status
+                with subcols[2]:
+                    status = "✅ Safe" if low <= value <= high else "⚠️ Unsafe"
+                    color = "#39FF14" if low <= value <= high else "red"
+                    st.markdown(
+                        f"<div style='font-size:18px; color:{color};'><b>{status}</b></div>",
+                        unsafe_allow_html=True
+                    )
 
     st.info("ℹ️ Compare your water parameters above with the WHO safe ranges.")
 
@@ -195,30 +206,69 @@ with tabs[2]:
     st.subheader("⚠️ Dangers of Radioactive Water")
     st.image("radioactive_process.png", caption="Radioactive Contamination Process", use_column_width=True)
 
-    tab3_html = """
-    <div style="background-color:#1a1a1a; padding:20px; border-radius:12px; color:#e8f5e9;">
-        <h3 style="color:#FFD300;">🌍 Environmental Impact</h3>
-        <ul>
-            <li>Bioaccumulation: Radioactive isotopes accumulate in plants & animals. 
-            <a href="https://ensia.com/features/radioactive-contamination-drinking-water-radium-radon-uranium/?utm_source=chatgpt.com" target="_blank" style="color:#39FF14;">[Read More]</a></li>
-            <li>Ecosystem Disruption: Contaminated water affects biodiversity.</li>
+    # Health Risks
+    st.markdown(
+        """
+        <div style="background-color:#1a1a1a; padding:15px; border-radius:12px; margin-bottom:10px;">
+        <h4 style="color:#FFD300;">☢️ Health Risks</h4>
+        <ul style="color:#e8f5e9;">
+        <li><b>Cancer:</b> Long-term exposure to radioactive elements can increase cancer risk. 
+        <a href="https://ensia.com/features/radioactive-contamination-drinking-water-radium-radon-uranium/?utm_source=chatgpt.com" target="_blank" style="color:#39FF14;">[Read More]</a></li>
+        <li><b>Organ Damage:</b> Kidney and liver dysfunction may occur. 
+        <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC3261972/?utm_source=chatgpt.com" target="_blank" style="color:#39FF14;">[Study]</a></li>
+        <li><b>Genetic Mutations:</b> Can affect future generations. 
+        <a href="https://link.springer.com/chapter/10.1007/978-3-031-89591-3_10?utm_source=chatgpt.com" target="_blank" style="color:#39FF14;">[Reference]</a></li>
         </ul>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
 
-        <h3 style="color:#FFD300;">🛡️ WHO Guidelines</h3>
-        <ul>
-            <li><a href="https://apps.who.int/iris/bitstream/handle/10665/44584/9789241548151_eng.pdf?utm_source=chatgpt.com" target="_blank" style="color:#39FF14;">WHO Guidelines for Drinking-water Quality</a></li>
-            <li><a href="https://cdn.who.int/media/docs/default-source/wash-documents/water-safety-and-quality/dwq-guidelines-4/gdwq4-with-add1-chap9.pdf?sfvrsn=6fc78cae_3&utm_source=chatgpt.com" target="_blank" style="color:#39FF14;">Chapter 9: Radiological Aspects</a></li>
+    # Environmental Impact
+    st.markdown(
+        """
+        <div style="background-color:#1a1a1a; padding:15px; border-radius:12px; margin-bottom:10px;">
+        <h4 style="color:#FF7518;">🌍 Environmental Impact</h4>
+        <ul style="color:#e8f5e9;">
+        <li><b>Bioaccumulation:</b> Radioactive isotopes accumulate in plants & animals. 
+        <a href="https://ensia.com/features/radioactive-contamination-drinking-water-radium-radon-uranium/?utm_source=chatgpt.com" target="_blank" style="color:#39FF14;">[Read More]</a></li>
+        <li><b>Ecosystem Disruption:</b> Contaminated water affects biodiversity.</li>
         </ul>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
 
-        <h3 style="color:#FFD300;">📚 Further Reading</h3>
-        <ul>
-            <li><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC3261972/?utm_source=chatgpt.com" target="_blank" style="color:#39FF14;">Health Effects of Naturally Radioactive Water Ingestion</a></li>
-            <li><a href="https://www.ncbi.nlm.nih.gov/books/NBK234160/?utm_source=chatgpt.com" target="_blank" style="color:#39FF14;">Radioactive Contaminants in Drinking Water and Their Health Effects</a></li>
+    # WHO Guidelines
+    st.markdown(
+        """
+        <div style="background-color:#1a1a1a; padding:15px; border-radius:12px; margin-bottom:10px;">
+        <h4 style="color:#39FF14;">🛡️ WHO Guidelines</h4>
+        <ul style="color:#e8f5e9;">
+        <li><a href="https://apps.who.int/iris/bitstream/handle/10665/44584/9789241548151_eng.pdf?utm_source=chatgpt.com" target="_blank" style="color:#FFD300;"><b>WHO Guidelines for Drinking-water Quality</b></a></li>
+        <li><a href="https://cdn.who.int/media/docs/default-source/wash-documents/water-safety-and-quality/dwq-guidelines-4/gdwq4-with-add1-chap9.pdf?sfvrsn=6fc78cae_3&utm_source=chatgpt.com" target="_blank" style="color:#FFD300;"><b>Chapter 9: Radiological Aspects</b></a></li>
         </ul>
-    </div>
-    """
-    st.markdown(tab3_html, unsafe_allow_html=True)
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+
+    # Further Reading
+    st.markdown(
+        """
+        <div style="background-color:#1a1a1a; padding:15px; border-radius:12px;">
+        <h4 style="color:#FFD300;">📚 Further Reading</h4>
+        <ul style="color:#e8f5e9;">
+        <li><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC3261972/?utm_source=chatgpt.com" target="_blank" style="color:#39FF14;">Health Effects of Naturally Radioactive Water Ingestion</a></li>
+        <li><a href="https://www.ncbi.nlm.nih.gov/books/NBK234160/?utm_source=chatgpt.com" target="_blank" style="color:#39FF14;">Radioactive Contaminants in Drinking Water and Their Health Effects</a></li>
+        </ul>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+
     st.info("ℹ️ Stay informed and take action to ensure safe drinking water.")
 
+# Footer
 st.markdown("---")
 st.markdown('<p style="text-align:center; color:#FFD300;">👨‍💻 Developed by Karthikeyan</p>', unsafe_allow_html=True)
